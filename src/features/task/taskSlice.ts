@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { database } from '../../common/firebase';
 import { ref, push, get, update, remove } from 'firebase/database';
 
-export type TaskType {
+export type TaskType = {
     id: string;
     createdAt: number;
     title: string;

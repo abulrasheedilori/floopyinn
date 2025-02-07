@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { database } from '../../firebaseConfig';
+import { database } from '../../common/firebase';
 import { ref, push, get, update, remove } from 'firebase/database';
 
 export type TaskType {

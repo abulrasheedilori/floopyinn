@@ -8,13 +8,14 @@ import { auth } from '../../common/firebase';
 import { facebookProvider, googleProvider, database } from '../../common/firebase';
 import { ref, set, push, get, update, remove } from 'firebase/database';
 
-type User = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
+export type User = {
+  id?: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
   password?: string;
-}
+};
+
 type AuthState = {
   user: User | null;
   members: User[];
@@ -49,20 +50,22 @@ export const fetchMembers = createAsyncThunk('auth/fetchMembers', async () => {
   return members;
 });
 
-// Thunk to sign up a user with email and password
 export const signUpWithEmail = createAsyncThunk(
   'auth/signUpWithEmail',
-  async ({ email, password, firstName, lastName }: { email: string; password: string; firstName: string; lastName: string }) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  async (user: User) => {
+    if (!user.email || !user.password) {
+      throw new Error('Email and password are required');
+    }
+    const userCredential = await createUserWithEmailAndPassword(auth, user.email, user.password);
     const firebaseUser = userCredential.user;
-    const user: User = {
+    const newUser = {
       id: firebaseUser.uid,
-      firstName,
-      lastName,
-      email: firebaseUser.email || '',
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: firebaseUser.email,
     };
-    await writeUserData(user);
-    return user;
+    await writeUserData(newUser);
+    return newUser;
   }
 );
 

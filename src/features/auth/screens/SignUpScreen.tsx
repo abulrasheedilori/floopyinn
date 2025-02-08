@@ -3,7 +3,7 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { GoogleLoginButton, FacebookLoginButton } from 'react-social-login-buttons';
-import { useAppDispatch } from '../../../common/reduxtk/store';
+import { useAppDispatch } from '../../../common/reduxtk/hooks';
 // import { useNavigate } from 'react-router-dom';
 
 const SignUpScreen: React.FC = () => {

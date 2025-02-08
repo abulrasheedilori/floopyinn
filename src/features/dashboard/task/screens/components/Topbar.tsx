@@ -19,7 +19,7 @@ const Topbar: React.FC = () => {
         <input
           type="text"
           placeholder="Search..."
-          className="w-[40vw] px-4 py-2 border border-slate-200 rounded-2xl focus:outline-slate-400"
+          className="w-[60vw] px-4 py-2 border border-slate-300 rounded-2xl focus:outline-slate-400"
         />
       </div>
       <div className="flex items-center space-x-4">
@@ -42,7 +42,7 @@ const Topbar: React.FC = () => {
             {showDropdown ?  <RiArrowDropUpLine size={24} onClick={()=>setShowDropdown(false)}/> : <RiArrowDropDownLine size={24} onClick={()=>setShowDropdown(true)} />}
             </button>
           {/* Dropdown menu */}
-          {showDropdown && <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg">
+          {showDropdown && <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg">
             <a href="/profile" className="block px-4 py-2 hover:bg-black hover:text-slate-50 hover:rounded-lg">
               Profile
             </a>

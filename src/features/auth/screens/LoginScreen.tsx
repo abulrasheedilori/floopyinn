@@ -51,7 +51,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { GoogleLoginButton, FacebookLoginButton } from 'react-social-login-buttons';
 import { signInWithEmail, signInWithFacebook, signInWithGoogle } from '../authSlice';
-import { useAppDispatch } from '../../../common/reduxtk/store';
+import { useAppDispatch } from '../../../common/reduxtk/hooks';
 
 const Login = () => {
     const dispatch = useAppDispatch();

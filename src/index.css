@@ -111,3 +111,10 @@
   background-color: #333;
   color: #fff;
 }
+
+.avatargroup {
+  margin-left: -12px; /* Adjust this value to control the overlap amount */
+}
+.avatargroup:first-child {
+  margin-left: 0; /* Ensure the first avatar has no negative margin */
+}

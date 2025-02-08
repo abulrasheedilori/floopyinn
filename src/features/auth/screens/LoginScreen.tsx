@@ -51,10 +51,10 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { GoogleLoginButton, FacebookLoginButton } from 'react-social-login-buttons';
 import { signInWithEmail, signInWithFacebook, signInWithGoogle } from '../authSlice';
+import { useAppDispatch } from '../../../common/reduxtk/store';
 
 const Login = () => {
-
-    // const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
 
 
   const validationSchema = Yup.object({
@@ -65,8 +65,8 @@ const Login = () => {
   const handleSubmit = (values, { resetForm }) => {
     console.log('Form Data:', values);
     // Implement your login logic here
-        // dispatch(signInWithEmail({ email: values.email, password: values.password })); //password can be 
-    resetForm(); // Auto clear form on submission
+    dispatch(signInWithEmail({ email: values.email, password: values.password }));
+    resetForm();
   };
 
   const handleFacebookLogin = () => {

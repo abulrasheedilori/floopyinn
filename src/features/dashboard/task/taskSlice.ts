@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { database } from '../../common/firebase';
 import { ref, push, get, update, remove } from 'firebase/database';
+import { database } from '../../../common/firebase';
 
 export type TaskType = {
     id: string;
@@ -113,11 +113,6 @@ const authSlice = createSlice({
         .addCase(deleteTask.fulfilled, (state, action) => {
             state.tasks = state.tasks.filter((task) => task.id !== action.payload);
         })
-        .addCase(deleteTask.rejected, (state, action) => {
-            state.error = action.error.message || null;
-        }).addCase(deleteTask.pending, (state) => {
-            state.status = 'loading';
-        });
     },
   });
 

@@ -1,30 +1,38 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ref, push, get, update, remove } from 'firebase/database';
 import { database } from '../../../common/firebase';
+import { TaskTabType } from './views/screens/TaskScreen';
+
+export enum StatusType {
+    IDLE = "idle",
+    LOADING = "loading",
+    SUCCEEDED = "succeeded",
+    FAILED = "failed",
+};
 
 export type TaskType = {
     id: string;
-    createdAt: number;
+    createdAt: string;
     title: string;
     createdBy: string;
     updatedAt?: number;
     content: string;
-    flag: 'Todo' | 'OnGoing' | 'Completed';
+    flag: TaskTabType;
     teamLead: string;
     members: string[];
     completionRate: number;
-    expiryDate: number;
+    expiryDate: string;
   }
   
 type TaskStateType = {
   tasks: TaskType[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  status: StatusType;
   error: string | null
 }
 
 const initialState: TaskStateType = {
   tasks: [],
-  status: 'idle',
+  status: StatusType.IDLE,
   error: null,
 };
 
@@ -79,40 +87,52 @@ const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
         .addCase(fetchTasks.pending, (state) => {
-            state.status = 'loading';
+            state.status = StatusType.LOADING;
         })
         .addCase(fetchTasks.fulfilled, (state, action) => {
-            state.status = 'succeeded';
+            state.status = StatusType.SUCCEEDED;
             state.tasks = action.payload;
         })
         .addCase(fetchTasks.rejected, (state, action) => {
-            state.status = 'failed';
+            state.status = StatusType.FAILED;
             state.error = action.error.message || null;
         })
         .addCase(createTask.fulfilled, (state, action) => {
             state.tasks.push(action.payload);
+            state.status = StatusType.SUCCEEDED;
         })
+        .addCase(createTask.pending, (state) => {
+          state.status = StatusType.LOADING;
+      })
         .addCase(createTask.rejected, (state, action) => {
-            state.error = action.error.message || null;
+          state.status = StatusType.FAILED;
+          state.error = action.error.message || null;
         })
         .addCase(deleteTask.pending, (state) => {
-            state.status = 'loading';
-        })
-        .addCase(updateTask.fulfilled, (state, action) => {
-            const index = state.tasks.findIndex((task) => task.id === action.payload.id);
-            if (index !== -1) {
-            state.tasks[index] = action.payload;
-            }
-        })
-        .addCase(updateTask.rejected, (state, action) => {
-            state.error = action.error.message || null;
+          state.status = StatusType.LOADING;
         })
         .addCase(deleteTask.rejected, (state, action) => {
-            state.error = action.error.message || null;
-        })
-        .addCase(deleteTask.fulfilled, (state, action) => {
-            state.tasks = state.tasks.filter((task) => task.id !== action.payload);
-        })
+          state.status = StatusType.FAILED;
+          state.error = action.error.message || null;
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        state.status = StatusType.SUCCEEDED;
+          state.tasks = state.tasks.filter((task) => task.id !== action.payload);
+      })
+      .addCase(updateTask.fulfilled, (state, action) => {
+          const index = state.tasks.findIndex((task) => task.id === action.payload.id);
+          if (index !== -1) {
+          state.tasks[index] = action.payload;
+          }
+          state.status = StatusType.SUCCEEDED;
+      })
+      .addCase(updateTask.rejected, (state, action) => {
+        state
+          state.error = action.error.message || null;
+      })
+      .addCase(updateTask.pending, (state) => {
+          state.status = StatusType.LOADING;
+      });
     },
   });
 

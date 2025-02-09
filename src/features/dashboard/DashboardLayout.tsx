@@ -1,7 +1,7 @@
 // DashboardLayout.tsx
 import React from 'react';
-import Topbar from './task/screens/components/Topbar';
-import Sidebar from './task/screens/components/Sidebar';
+import Topbar from './task/views/components/Topbar';
+import Sidebar from './task/views/components/Sidebar';
 import { Outlet } from 'react-router-dom';
 
 const DashboardLayout: React.FC = () => {

@@ -1,39 +1,45 @@
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
-import TodoCard from "./components/TodoCard";
+import TodoCard from "../components/TodoCard";
+import { useAppDispatch, useAppSelector } from "../../../../../common/reduxtk/hooks";
+import OngoingTodoCard from "../components/OngoingTodoCard";
+import CompletedTodoCard from "../components/CompletedTodoCard";
 
-enum TaskTab {
+export enum TaskTabType{
   TODO = "TODO",
   ONGOING = "ONGOING",
   COMPLETED = "COMPLETED",
 };
 
 type TaskTabItemType = {
-  name: TaskTab;
+  name: TaskTabType;
   label: string;
   id: string;
 };
 
 const tabs:TaskTabItemType[]  = [
   {
-    name: TaskTab.TODO, id: '1',
+    name: TaskTabType.TODO, id: '1',
     label: "To Do(s)"
   },
   {
-    name: TaskTab.ONGOING, id: '2',
+    name: TaskTabType.ONGOING, id: '2',
     label: "On Going"
   },
   {
-    name: TaskTab.COMPLETED, id: '3',
+    name: TaskTabType.COMPLETED, id: '3',
     label: "Completed"
   },
  
 ];
 
-const TaskScreen = () =>{
-  const [active, setActive] = useState<TaskTab>(TaskTab.TODO);
+const TaskScreen: React.FC = () =>{
+  const [active, setActive] = useState<TaskTabType>(TaskTabType.TODO);
+  
+  const dispatch = useAppDispatch();
+  const tasks = useAppSelector((state) => state.tasks.tasks);
 
-  const handleSetActive = (value: TaskTab) => {
+  const handleSetActive = (value: TaskTabType) => {
     setActive(value);
   };
 
@@ -52,7 +58,9 @@ const TaskScreen = () =>{
             </button>
         </section>
         <section className="flex flex-row justify-around items-start flex-wrap gap-2">
-          {[1,2,3,4,5,6,7,8,9,10,11,12].map(item => <TodoCard key={item}/>)}
+          {/* {tasks.map(task => <TodoCard key={task.id} task={task}/>)} */}
+          {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].map(task => <CompletedTodoCard key={task}/>)}
+
         </section>
     </section>
   )

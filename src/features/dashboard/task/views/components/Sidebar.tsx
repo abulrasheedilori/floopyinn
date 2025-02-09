@@ -14,7 +14,7 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="w-[12wv] h-full text-slate-600 shadow-md relative">
+    <div className="w-[12wv] h-full text-slate-600 bg-slate-50 shadow-md relative">
       <nav className="mt-4 ml-4 flex flex-col justify-center items-start">
         <section className='flex flex-row items-center justify-items-start mb-8'>
           <img src="../../../../../assets/floopyinn.png" alt="" className="w-36 h-10 rounded-full border border-gray-400" />

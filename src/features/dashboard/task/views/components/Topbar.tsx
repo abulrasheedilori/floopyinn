@@ -19,10 +19,10 @@ const Topbar: React.FC = () => {
         <input
           type="text"
           placeholder="Search..."
-          className="w-[60vw] px-4 py-2 border border-slate-300 rounded-2xl focus:outline-slate-400"
+          className="w-[40vw] px-4 py-2 border border-slate-300 rounded-2xl focus:outline-slate-400"
         />
       </div>
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 bg-slate-50 py-4 px-2">
         <button className="relative">
           <IoNotificationsOutline size={32}/>
         <span className="absolute top-0 right-0 inline-block w-4 h-4 bg-red-600 text-xs text-slate-50 rounded-full">12</span>
@@ -43,7 +43,7 @@ const Topbar: React.FC = () => {
             </button>
           {/* Dropdown menu */}
           {showDropdown && <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg">
-            <a href="/profile" className="block px-4 py-2 hover:bg-black hover:text-slate-50 hover:rounded-lg">
+            <a href="/account" className="block px-4 py-2 hover:bg-black hover:text-slate-50 hover:rounded-lg">
               Profile
             </a>
             <a href="/settings" className="block px-4 py-2 hover:bg-black hover:text-slate-50 hover:rounded-lg">

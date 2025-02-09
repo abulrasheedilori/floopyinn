@@ -59,7 +59,16 @@ const TaskScreen: React.FC = () =>{
         </section>
         <section className="flex flex-row justify-around items-start flex-wrap gap-2">
           {/* {tasks.map(task => <TodoCard key={task.id} task={task}/>)} */}
-          {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].map(task => <CompletedTodoCard key={task}/>)}
+          {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].map(task => {
+            if(active === TaskTabType.TODO){
+              return <TodoCard key={task}/> 
+            }
+            if(active === TaskTabType.ONGOING){
+              return <OngoingTodoCard key={task}/>
+            }
+            return <CompletedTodoCard key={task}/>
+            })
+          }
 
         </section>
     </section>

@@ -1,84 +1,35 @@
-// LoginScreen.tsx
-// import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { signInWithEmail } from '../authSlice';
-// import { useAppDispatch } from '../../../common/reduxtk/store';
-
-// const LoginScreen: React.FC = () => {
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const navigate = useNavigate();
-
-//   const handleLogin = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     dispatch(signInWithEmail({ email, password }));
-//     navigate('/');
-//   };
-
-//   return (
-//     <div>
-//       <h2>Log In</h2>
-//       <form onSubmit={handleLogin}>
-//         <input
-//           type="email"
-//           placeholder="Email"
-//           value={email}
-//           onChange={(e) => setEmail(e.target.value)}
-//           required
-//         />
-//         <input
-//           type="password"
-//           placeholder="Password"
-//           value={password}
-//           onChange={(e) => setPassword(e.target.value)}
-//           required
-//         />
-//         <button type="submit">Log In</button>
-//       </form>
-//       <p>
-//         Don't have an account? <a href="/">Sign Up</a>
-//       </p>
-//     </div>
-//   );
-// };
-
-// export default LoginScreen;
-
-
-
-import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { GoogleLoginButton, FacebookLoginButton } from 'react-social-login-buttons';
-import { signInWithEmail, signInWithFacebook, signInWithGoogle } from '../authSlice';
-import { useAppDispatch } from '../../../common/reduxtk/hooks';
+import { useAppDispatch } from '../../../../common/reduxtk/hooks';
+import { signInWithEmail, signInWithFacebook, signInWithGoogle } from '../../authSlice';
+import { useNavigate } from 'react-router-dom';
+
 
 const Login = () => {
-    const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-
-  const validationSchema = Yup.object({
+  const validationSchema = Yup.object<any>({
     email: Yup.string().email('Invalid email format').required('Email is required'),
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
   });
 
-  const handleSubmit = (values, { resetForm }) => {
+  const handleSubmit = (values: any, { resetForm }: any) => {
     console.log('Form Data:', values);
-    // Implement your login logic here
     dispatch(signInWithEmail({ email: values.email, password: values.password }));
     resetForm();
+    navigate('/');
   };
 
   const handleFacebookLogin = () => {
-    // Implement your Facebook login logic here
-    // dispatch(signInWithFacebook());
-    console.log('Facebook login clicked');
+    dispatch(signInWithFacebook());
+    navigate('/');
   };
 
   const handleGoogleLogin = () => {
-    // Implement your Google login logic here
-    // dispatch(signInWithGoogle());
-    console.log('Google login clicked');
+    dispatch(signInWithGoogle());
+    navigate('/');
   };
 
   return (
@@ -87,7 +38,7 @@ const Login = () => {
         <section className='w-[33vw] h-full flex flex-col items-stretch justify-center px-4'>
           <section className='flex flex-col items-center justify-center'>
             <section className="flex justify-center items-center">
-              <img src="../../../assets/floopyinn_logo.png" alt="logo" className="rounded-full h-32 w-32"/>
+              <img src="../../../assets/floopyinn_logo.png" alt="logo" className="rounded-full h-32 w-32" />
             </section>
             <h2 className='text-3xl text py-2 font-extrabold'>Welcome Back</h2>
             <p className='pb-8 text-slate-400 text-center'>Log in to continue to your account.</p>

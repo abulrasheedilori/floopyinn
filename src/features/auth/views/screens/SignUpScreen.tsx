@@ -1,13 +1,13 @@
-import { signUpWithEmail, signInWithGoogle, signInWithFacebook, User } from '../authSlice';
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { GoogleLoginButton, FacebookLoginButton } from 'react-social-login-buttons';
-import { useAppDispatch } from '../../../common/reduxtk/hooks';
-// import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../../../common/reduxtk/hooks';
+import { signInWithFacebook, signInWithGoogle, signUpWithEmail, User } from '../../authSlice';
+import { CustomFacebookLoginButton, CustomGoogleLoginButton } from '../components/CustomSocialMediaLoginButton.tsx';
+import { useNavigate } from 'react-router-dom';
 
 const SignUpScreen: React.FC = () => {
-  const validationSchema = Yup.object({
+  const validationSchema = Yup.object<User>({
     firstName: Yup.string().required('First Name is required'),
     lastName: Yup.string().required('Last Name is required'),
     email: Yup.string().email('Invalid email format').required('Email is required'),
@@ -16,52 +16,55 @@ const SignUpScreen: React.FC = () => {
   });
 
   const dispatch = useAppDispatch();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleGoogleSignIn = () => {
     dispatch(signInWithGoogle());
+    navigate('/');
   };
 
   const handleFacebookSignIn = () => {
     dispatch(signInWithFacebook());
+    navigate('/');
   };
 
   return (
-    <section className='w-[100vw] h-[100vh] flex flex-col justify-center items-center'>
-      <section className='w-[70vw] h-[90vh] flex flex-col items-center justify-start border border-slate-50 shadow-lg rounded-2xl'>
+    <section className='w-[100vw] h-[100vh] bg-slate-50 flex flex-col justify-center items-center'>
+      <section className='w-[70vw] bg-white h-[90vh] flex flex-col items-center justify-start border border-slate-50 shadow-lg rounded-2xl'>
         <section className='w-[33vw] h-full flex flex-col items-stretch justify-center px-4'>
           <section className='flex flex-col items-center justify-center'>
             <section className="flex justify-center items-center">
-              <img src="../../../assets/floopyinn_logo.png" alt="logo" className="rounded-full h-32 w-32"/>
+              <img src="../../../assets/floopyinn_logo.png" alt="logo" className="rounded-full h-32 w-32" />
             </section>
-            <h2 className='text-3xl text py-2 font-extrabold'>Create an account</h2>
+            <h2 className='text-3xl text py-2 font-extrabold'>Create An account</h2>
             <p className='pb-8 text-slate-400 text-center'>We'd love to have you on board. Join over 500+ customers worldwide.</p>
           </section>
 
           <section className='flex flex-col items-center justify-center'>
-          <FacebookLoginButton onClick={handleFacebookSignIn} />
-          <GoogleLoginButton onClick={handleGoogleSignIn} />
+            <CustomFacebookLoginButton onClick={handleFacebookSignIn} />
+            <CustomGoogleLoginButton onClick={handleGoogleSignIn} />
           </section>
-          <hr className='text-slate-200 my-8'/>
+          <hr className='text-slate-200 my-8' />
 
           <Formik
             initialValues={{ firstName: '', lastName: '', email: '', password: '', terms: false }}
             validationSchema={validationSchema}
             onSubmit={(values, { resetForm }) => {
-              const user: User = {firstName: values.firstName, lastName: values.lastName, email: values.email, password: values.password};
-                  dispatch(signUpWithEmail(user));
+              const user: User = { firstName: values.firstName, lastName: values.lastName, email: values.email, password: values.password };
+              dispatch(signUpWithEmail(user));
               console.log('Form Data:', values);
               resetForm();
+              navigate('/');
             }}
           >
-            {({  isValid, dirty }) => (
+            {({ isValid, dirty }) => (
               <Form className='flex flex-col items-center justify-center'>
                 <section className='w-full my-2'>
                   <label className='text-start font-bold py-4'>First Name <span className='text-red-500'>*</span></label>
                   <Field name="firstName" placeholder="Enter your First Name" className='border h-[50px] border-gray-200 w-full rounded-lg p-2 focus:outline-gray-300' />
                   <ErrorMessage name="firstName" component="div" className='text-red-500 text-xs' />
                 </section>
-                
+
                 <section className='w-full my-2'>
                   <label className='text-start font-bold py-4'>Last Name <span className='text-red-500'>*</span></label>
                   <Field name="lastName" placeholder="Enter your Last Name" className='border h-[50px] border-gray-200 w-full rounded-lg p-2 focus:outline-gray-300' />
@@ -89,9 +92,8 @@ const SignUpScreen: React.FC = () => {
                 </section>
 
                 <button
-                  className={`w-full h-[50px] my-8 rounded-2xl ${
-                    isValid && dirty ? 'bg-black text-slate-200' : 'bg-gray-400 text-gray-700'
-                  }`}
+                  className={`w-full h-[50px] my-8 rounded-2xl ${isValid && dirty ? 'bg-black text-slate-200' : 'bg-gray-400 text-gray-700'
+                    }`}
                   type="submit" disabled={!(isValid && dirty)}>Sign Up
                 </button>
               </Form>

@@ -1,10 +1,8 @@
 import './index.css'
 import Toast from './common/components/Toast';
-import LoginScreen from './features/auth/screens/LoginScreen';
 import { Provider } from 'react-redux';
 import { store } from './common/reduxtk/store';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import SignUpScreen from './features/auth/screens/SignUpScreen';
 import TaskScreen from './features/dashboard/task/views/screens/TaskScreen';
 import DashboardLayout from './features/dashboard/DashboardLayout';
 import AccountScreen from './features/dashboard/task/views/screens/AccountScreen';
@@ -19,6 +17,8 @@ import SettingScreen from './features/dashboard/task/views/screens/SettingScreen
 import TicketScreen from './features/dashboard/task/views/screens/TicketScreen';
 import OverviewScreen from './features/dashboard/task/views/screens/OverviewScreen';
 import { FaCog, FaHome, FaUser } from 'react-icons/fa';
+import LoginScreen from './features/auth/views/screens/LoginScreen';
+import SignUpScreen from './features/auth/views/screens/SignUpScreen';
 
 export type NavItemType = {
   name: string;
@@ -57,19 +57,20 @@ export const navItems: NavItemType[] = [
     name: 'Employee', path: '/employee', icon: <FaCog />,
     element: <EmployeeScreen />,
     nestedItem: [
-      {name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: []},
-      {name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: []},
-      {name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: []},
+      { name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: [] },
+      { name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: [] },
+      { name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: [] },
     ]
   },
   {
     name: 'Attendance', path: '/attendance', icon: <FaCog />,
     element: <AttendanceScreen />,
     nestedItem: [
-      {name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: []},
-      {name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: []},
-      {name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: []},
-    ]  },
+      { name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: [] },
+      { name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: [] },
+      { name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: [] },
+    ]
+  },
   {
     name: 'Notice', path: '/notice', icon: <FaCog />,
     element: <NoticeScreen />,
@@ -79,10 +80,11 @@ export const navItems: NavItemType[] = [
     name: 'HR Tab', path: '/hrtab', icon: <FaCog />,
     element: <HrtabScreen />,
     nestedItem: [
-      {name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: []},
-      {name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: []},
-      {name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: []},
-    ]  },
+      { name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: [] },
+      { name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: [] },
+      { name: 'Overview', path: '/', icon: <FaHome />, element: <OverviewScreen />, nestedItem: [] },
+    ]
+  },
   {
     name: 'Organization', path: '/organization', icon: <FaCog />,
     element: <OrganizationScreen />,
@@ -100,31 +102,31 @@ export const navItems: NavItemType[] = [
   },
 ];
 
-const App = () =>{
-// const {isAuthenticated} = useAppSelector(state => state.auth);
+const App = () => {
+  // const {isAuthenticated} = useAppSelector(state => state.auth);
 
   return (
     <section>
       <Toast />
-      <Provider store={store}> 
-      <BrowserRouter>
-        <Routes>
-          {/* {isAuthenticated ? (
+      <Provider store={store}>
+        <BrowserRouter>
+          <Routes>
+            {/* {isAuthenticated ? (
             <Route path="/" element={<Navigate to="/overview" />} />
               ) : (
                 <Route path="/" element={<SignUpScreen />} />
               )} */}
-          <Route path="/" element={<DashboardLayout />} >
-            <Route index element={<TaskScreen />} />
-            {navItems.map((item) => (
-              <Route path={item.path} element={item.element} />
-            )) }
-          </Route>
-          <Route path="/login" element={<LoginScreen />} />
-          <Route path="*" element={<SignUpScreen />} />
-        </Routes>
-      </BrowserRouter>
-      </Provider> 
+            <Route path="/" element={<DashboardLayout />} >
+              <Route index element={<TaskScreen />} />
+              {navItems.map((item) => (
+                <Route path={item.path} element={item.element} />
+              ))}
+            </Route>
+            <Route path="/login" element={<LoginScreen />} />
+            <Route path="*" element={<SignUpScreen />} />
+          </Routes>
+        </BrowserRouter>
+      </Provider>
     </section>
   );
 }

@@ -18,13 +18,13 @@ const SignUpScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const handleGoogleSignIn = () => {
-    dispatch(signInWithGoogle());
+  const handleGoogleSignIn = async () => {
+    await dispatch(signInWithGoogle());
     navigate('/');
   };
 
-  const handleFacebookSignIn = () => {
-    dispatch(signInWithFacebook());
+  const handleFacebookSignIn = async () => {
+    await dispatch(signInWithFacebook());
     navigate('/');
   };
 
@@ -34,7 +34,7 @@ const SignUpScreen: React.FC = () => {
         <section className='w-[33vw] h-full flex flex-col items-stretch justify-center px-4'>
           <section className='flex flex-col items-center justify-center'>
             <section className="flex justify-center items-center">
-              <img src="../../../assets/floopyinn_logo.png" alt="logo" className="rounded-full h-32 w-32" />
+              <img src="../../../../assets/playstore.png" alt="logo" className="rounded-full h-12 w-24" />
             </section>
             <h2 className='text-3xl text py-2 font-extrabold'>Create An account</h2>
             <p className='pb-8 text-slate-400 text-center'>We'd love to have you on board. Join over 500+ customers worldwide.</p>
@@ -49,9 +49,9 @@ const SignUpScreen: React.FC = () => {
           <Formik
             initialValues={{ firstName: '', lastName: '', email: '', password: '', terms: false }}
             validationSchema={validationSchema}
-            onSubmit={(values, { resetForm }) => {
+            onSubmit={async (values, { resetForm }) => {
               const user: User = { firstName: values.firstName, lastName: values.lastName, email: values.email, password: values.password };
-              dispatch(signUpWithEmail(user));
+              await dispatch(signUpWithEmail(user));
               console.log('Form Data:', values);
               resetForm();
               navigate('/');

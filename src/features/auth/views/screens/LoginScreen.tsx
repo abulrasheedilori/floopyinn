@@ -15,20 +15,20 @@ const Login = () => {
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
   });
 
-  const handleSubmit = (values: any, { resetForm }: any) => {
+  const handleSubmit = async (values: any, { resetForm }: any) => {
     console.log('Form Data:', values);
-    dispatch(signInWithEmail({ email: values.email, password: values.password }));
+    await dispatch(signInWithEmail({ email: values.email, password: values.password }));
     resetForm();
     navigate('/');
   };
 
-  const handleFacebookLogin = () => {
-    dispatch(signInWithFacebook());
+  const handleFacebookLogin = async () => {
+    await dispatch(signInWithFacebook());
     navigate('/');
   };
 
-  const handleGoogleLogin = () => {
-    dispatch(signInWithGoogle());
+  const handleGoogleLogin = async () => {
+    await dispatch(signInWithGoogle());
     navigate('/');
   };
 

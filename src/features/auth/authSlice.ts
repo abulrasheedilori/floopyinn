@@ -22,6 +22,7 @@ type AuthState = {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   isAuthenticated: boolean;
+  darkMode: boolean;
 }
 
 const initialState: AuthState = {
@@ -30,6 +31,7 @@ const initialState: AuthState = {
   status: 'idle',
   error: null,
   isAuthenticated: false,
+  darkMode: false,
 };
 
 // Helper function to write user data to the Realtime Database
@@ -147,14 +149,29 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
     },
+    toggleTheme(state) {
+      if (state.darkMode) { state.darkMode = false; } else { state.darkMode = true; }
+    },
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchMembers.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchMembers.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.members = action.payload;
+      })
+      .addCase(fetchMembers.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || null;
+      })
       .addCase(signUpWithEmail.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(signUpWithEmail.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        state.isAuthenticated = true;
         state.user = action.payload;
       })
       .addCase(signUpWithEmail.rejected, (state, action) => {
@@ -166,6 +183,7 @@ const authSlice = createSlice({
       })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        state.isAuthenticated = true;
         state.user = action.payload;
       })
       .addCase(signInWithEmail.rejected, (state, action) => {
@@ -173,13 +191,15 @@ const authSlice = createSlice({
         state.error = action.error.message || null;
       })
       .addCase(signInWithGoogle.fulfilled, (state, action) => {
+        state.isAuthenticated = true;
         state.user = action.payload;
       })
       .addCase(signInWithFacebook.fulfilled, (state, action) => {
+        state.isAuthenticated = true;
         state.user = action.payload;
       });
   },
 });
 
-export const { setUser, clearUser, signOut } = authSlice.actions;
+export const { setUser, clearUser, signOut, toggleTheme } = authSlice.actions;
 export default authSlice.reducer;

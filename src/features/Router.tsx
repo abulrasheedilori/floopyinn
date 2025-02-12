@@ -10,13 +10,12 @@ import { navItems } from './navigation/navItems';
 
 const RouterLayout = () => {
     const isAuthenticated = useAppSelector((state: RootState) => state.auth.isAuthenticated);
-    console.log("isAuthenticated:", isAuthenticated);
 
     return (
         <section>
             <Toast />
             <BrowserRouter>
-                <Routes>
+                {/* <Routes>
                     {isAuthenticated ? (
                         <>
                             <Route path="/" element={<DashboardLayout />}>
@@ -33,7 +32,31 @@ const RouterLayout = () => {
                         </>
                     )}
                     <Route path="*" element={<SignUpScreen />} />
+                </Routes> */}
+                <Routes>
+                    {isAuthenticated ? (
+                        <>
+                            <Route path="/" element={<DashboardLayout />}>
+                                <Route index element={<OverviewScreen />} />
+                                {navItems.map((item) => (
+                                    <Route key={item.name} path={item.path} element={item.element}>
+                                        {item.nestedItem.map((subItem) => (
+                                            <Route key={subItem.name} path={subItem.path.replace(`${item.path}/`, '')} element={subItem.element} />
+                                        ))}
+                                    </Route>
+                                ))}
+                            </Route>
+                        </>
+                    ) : (
+                        <>
+                            <Route path="/" element={<Navigate to="/login" replace />} />
+                            <Route path="/login" element={<LoginScreen />} />
+                            <Route path="/signup" element={<SignUpScreen />} />
+                        </>
+                    )}
+                    <Route path="*" element={<Navigate to={isAuthenticated ? '/' : '/login'} replace />} />
                 </Routes>
+
             </BrowserRouter>
         </section>
     );

@@ -1,13 +1,17 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../../../common/middleware/showToast.ts';
-import { auth, facebookProvider, googleProvider } from '../../../../common/firebase.ts';
+import { auth } from '../../../../common/firebase.ts';
 import { CustomFacebookLoginButton, CustomGoogleLoginButton } from '../components/CustomSocialMediaLoginButton.tsx.tsx';
+import { facebookSignIn, googleSignIn } from '../../authSlice.ts';
+import { useAppDispatch } from '../../../../common/reduxtk/hooks.ts';
+import floopyinnLogo from "../../../../assets/playstore.png";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email format').required('Email is required'),
@@ -17,7 +21,7 @@ const Login = () => {
   // 🔹 Handle email/password login
   const handleSubmit = async (values: { email: string; password: string }, { resetForm }: any) => {
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      await signInWithEmailAndPassword(auth, values.email, values.password); //decided not to use thunk here
       showToast("success", "Login successful!");
       resetForm();
       navigate('/');
@@ -29,8 +33,7 @@ const Login = () => {
   // 🔹 Handle Google sign-in
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
-      showToast("success", "Signed in with Google successfully!");
+      await dispatch(googleSignIn())
       navigate('/');
     } catch (error: any) {
       showToast("error", error.message);
@@ -40,8 +43,7 @@ const Login = () => {
   // 🔹 Handle Facebook sign-in
   const handleFacebookSignIn = async () => {
     try {
-      await signInWithPopup(auth, facebookProvider);
-      showToast("success", "Signed in with Facebook successfully!");
+      await dispatch(facebookSignIn())
       navigate('/');
     } catch (error: any) {
       showToast("error", error.message);
@@ -54,7 +56,7 @@ const Login = () => {
         <section className='w-[33vw] h-full flex flex-col items-stretch justify-center px-4'>
           <section className='flex flex-col items-center justify-center'>
             <section className="flex justify-center items-center">
-              <img src="../../../assets/floopyinn_logo.png" alt="logo" className="rounded-full h-32 w-32" />
+              <img src={floopyinnLogo} alt="logo" className="rounded-full h-32 w-32" />
             </section>
             <h2 className='text-3xl text py-2 font-extrabold'>Welcome Back</h2>
             <p className='pb-8 text-slate-400 text-center'>Log in to continue to your account.</p>

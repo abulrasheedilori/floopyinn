@@ -8,13 +8,16 @@ import {
 import { auth } from '../../common/firebase';
 import { facebookProvider, googleProvider, database } from '../../common/firebase';
 import { ref, set, push, get, update, remove, getDatabase } from 'firebase/database';
+import axios from 'axios';
 
+const API_URL = "https://floopyinn-433b3-default-rtdb.firebaseio.com/users";
 export type User = {
   id?: string | null;
   firstName: string | null;
   lastName: string | null;
   email: string | null;
   password?: string;
+  photoURL?: string;
 };
 
 type AuthState = {
@@ -78,6 +81,7 @@ export const signUpWithEmail = createAsyncThunk(
       firstName: user.firstName,
       lastName: user.lastName,
       email: firebaseUser.email,
+      photoURL: firebaseUser.photoURL || ""
     };
     await writeUserData(newUser);
     return newUser;
@@ -109,6 +113,7 @@ export const signInWithGoogle = createAsyncThunk('auth/signInWithGoogle', async 
     firstName: firebaseUser.displayName?.split(' ')[0] || '',
     lastName: firebaseUser.displayName?.split(' ')[1] || '',
     email: firebaseUser.email || '',
+    photoURL: firebaseUser.photoURL || ""
   };
   await writeUserData(user);
   return user;
@@ -123,9 +128,56 @@ export const signInWithFacebook = createAsyncThunk('auth/signInWithFacebook', as
     firstName: firebaseUser.displayName?.split(' ')[0] || '',
     lastName: firebaseUser.displayName?.split(' ')[1] || '',
     email: firebaseUser.email || '',
+    photoURL: firebaseUser.photoURL || ""
   };
   await writeUserData(user);
   return user;
+});
+
+// 🔹 Helper function to check if the user exists in the database
+const checkUserInDatabase = async (uid: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/${uid}`);
+    return response.data; // User exists
+  } catch (error) {
+    return null; // User does not exist
+  }
+};
+
+// 🔹 Google Sign-In Thunk
+export const googleSignIn = createAsyncThunk('auth/googleSignIn', async (_, { rejectWithValue }) => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    // Check if the user exists in the database
+    const existingUser = await checkUserInDatabase(user.uid);
+    if (!existingUser) {
+      throw new Error('User not found in database. Kindly sign up');
+    }
+
+    return existingUser; // Proceed with login
+  } catch (error: any) {
+    return rejectWithValue(error.message);
+  }
+});
+
+// 🔹 Facebook Sign-In Thunk
+export const facebookSignIn = createAsyncThunk('auth/facebookSignIn', async (_, { rejectWithValue }) => {
+  try {
+    const result = await signInWithPopup(auth, facebookProvider);
+    const user = result.user;
+
+    // Check if the user exists in the database
+    const existingUser = await checkUserInDatabase(user.uid);
+    if (!existingUser) {
+      throw new Error('User not found in database');
+    }
+
+    return existingUser; // Proceed with login
+  } catch (error: any) {
+    return rejectWithValue(error.message);
+  }
 });
 
 // Thunk to update user data
@@ -151,14 +203,6 @@ const authSlice = createSlice({
   reducers: {
     signOut: (state) => {
       auth.signOut();
-      state.user = null;
-      state.isAuthenticated = false;
-    },
-    setUser(state, action: PayloadAction<User>) {
-      state.user = action.payload;
-      state.isAuthenticated = true;
-    },
-    clearUser(state) {
       state.user = null;
       state.isAuthenticated = false;
     },
@@ -210,9 +254,23 @@ const authSlice = createSlice({
       .addCase(signInWithFacebook.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.user = action.payload;
+      })
+      .addCase(googleSignIn.fulfilled, (state, action) => {
+        state.isAuthenticated = true;
+        state.user = action.payload;
+      })
+      .addCase(facebookSignIn.fulfilled, (state, action) => {
+        state.isAuthenticated = true;
+        state.user = action.payload;
+      })
+      .addCase(googleSignIn.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      .addCase(facebookSignIn.rejected, (state, action) => {
+        state.error = action.payload as string;
       });
   },
 });
 
-export const { setUser, clearUser, signOut, toggleTheme } = authSlice.actions;
+export const { signOut, toggleTheme } = authSlice.actions;
 export default authSlice.reducer;

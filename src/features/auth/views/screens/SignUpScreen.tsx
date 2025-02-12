@@ -6,6 +6,7 @@ import { signInWithFacebook, signInWithGoogle, signUpWithEmail, User } from '../
 import { CustomFacebookLoginButton, CustomGoogleLoginButton } from '../components/CustomSocialMediaLoginButton.tsx';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../../../common/middleware/showToast.ts';
+import floopyinnLogo from "../../../../assets/playstore.png"
 
 const SignUpScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -57,7 +58,7 @@ const SignUpScreen: React.FC = () => {
         <section className='w-[33vw] h-full flex flex-col items-stretch justify-center px-4'>
           <section className='flex flex-col items-center justify-center'>
             <section className="flex justify-center items-center">
-              <img src="../../../../assets/playstore.png" alt="logo" className="rounded-full h-12 w-24" />
+              <img src={floopyinnLogo} alt="logo" className="rounded-full h-24 w-24" />
             </section>
             <h2 className='text-3xl text py-2 font-extrabold'>Create An account</h2>
             <p className='pb-8 text-slate-400 text-center'>We'd love to have you on board. Join over 500+ customers worldwide.</p>

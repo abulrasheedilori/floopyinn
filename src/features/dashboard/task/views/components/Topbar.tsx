@@ -53,7 +53,7 @@ const Topbar: React.FC = () => {
 
         <div className={`relative ${darkMode ? "bg-gray-300" : null}`}>
           <button className="flex items-center space-x-2">
-            <RxAvatar size={24} />
+            <img src={user?.photoURL} alt="user photo" className="w-8 h-8 rounded-full" />
             <span className="text-lg">{`${user?.firstName} ${user?.lastName}`}</span>
             {showDropdown ? <RiArrowDropUpLine size={24} onClick={() => setShowDropdown(false)} /> : <RiArrowDropDownLine size={24} onClick={() => setShowDropdown(true)} />}
           </button>

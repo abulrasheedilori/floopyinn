@@ -1,35 +1,51 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { GoogleLoginButton, FacebookLoginButton } from 'react-social-login-buttons';
-import { useAppDispatch } from '../../../../common/reduxtk/hooks';
-import { signInWithEmail, signInWithFacebook, signInWithGoogle } from '../../authSlice';
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
-
+import { showToast } from '../../../../common/middleware/showToast.ts';
+import { auth, facebookProvider, googleProvider } from '../../../../common/firebase.ts';
+import { CustomFacebookLoginButton, CustomGoogleLoginButton } from '../components/CustomSocialMediaLoginButton.tsx.tsx';
 
 const Login = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const validationSchema = Yup.object<any>({
+  const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email format').required('Email is required'),
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
   });
 
-  const handleSubmit = async (values: any, { resetForm }: any) => {
-    console.log('Form Data:', values);
-    await dispatch(signInWithEmail({ email: values.email, password: values.password }));
-    resetForm();
-    navigate('/');
+  // 🔹 Handle email/password login
+  const handleSubmit = async (values: { email: string; password: string }, { resetForm }: any) => {
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      showToast("success", "Login successful!");
+      resetForm();
+      navigate('/');
+    } catch (error: any) {
+      showToast("error", error.message);
+    }
   };
 
-  const handleFacebookLogin = async () => {
-    await dispatch(signInWithFacebook());
-    navigate('/');
+  // 🔹 Handle Google sign-in
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      showToast("success", "Signed in with Google successfully!");
+      navigate('/');
+    } catch (error: any) {
+      showToast("error", error.message);
+    }
   };
 
-  const handleGoogleLogin = async () => {
-    await dispatch(signInWithGoogle());
-    navigate('/');
+  // 🔹 Handle Facebook sign-in
+  const handleFacebookSignIn = async () => {
+    try {
+      await signInWithPopup(auth, facebookProvider);
+      showToast("success", "Signed in with Facebook successfully!");
+      navigate('/');
+    } catch (error: any) {
+      showToast("error", error.message);
+    }
   };
 
   return (
@@ -74,15 +90,16 @@ const Login = () => {
             )}
           </Formik>
 
-          <section className='flex flex-col items-center justify-center'>
-            <p className='text-center mb-4'>Or log in with</p>
-            <FacebookLoginButton onClick={handleFacebookLogin} />
-            <GoogleLoginButton onClick={handleGoogleLogin} />
-          </section>
-
           <p className='text-center mt-4'>
             Don't have an account? <a href="/signup" className='hover:underline font-bold'>Sign up here.</a>
           </p>
+          <hr className='text-slate-200 my-8' />
+
+          <section className='flex flex-col items-center justify-center'>
+            <CustomFacebookLoginButton onClick={handleFacebookSignIn} />
+            <CustomGoogleLoginButton onClick={handleGoogleSignIn} />
+          </section>
+
         </section>
       </section>
     </section>

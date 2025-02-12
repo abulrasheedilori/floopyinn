@@ -1,12 +1,16 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useAppDispatch } from '../../../../common/reduxtk/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../common/reduxtk/hooks';
 import { signInWithFacebook, signInWithGoogle, signUpWithEmail, User } from '../../authSlice';
 import { CustomFacebookLoginButton, CustomGoogleLoginButton } from '../components/CustomSocialMediaLoginButton.tsx';
 import { useNavigate } from 'react-router-dom';
+import { showToast } from '../../../../common/middleware/showToast.ts';
 
 const SignUpScreen: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const validationSchema = Yup.object<User>({
     firstName: Yup.string().required('First Name is required'),
     lastName: Yup.string().required('Last Name is required'),
@@ -15,17 +19,36 @@ const SignUpScreen: React.FC = () => {
     terms: Yup.boolean().oneOf([true], 'You must accept the terms and conditions'),
   });
 
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-
   const handleGoogleSignIn = async () => {
-    await dispatch(signInWithGoogle());
-    navigate('/');
+    try {
+      const resultAction = await dispatch(signInWithGoogle());
+      //  Check if the action was rejected
+      if (signInWithGoogle.rejected.match(resultAction)) {
+        showToast("info", resultAction.error.message || "Something went wrong");
+        return;
+      }
+      //  Success case
+      showToast("success", `User is logged in successfully`);
+      navigate("/");
+    } catch (err: any) {
+      showToast("error", err);
+    }
   };
 
   const handleFacebookSignIn = async () => {
-    await dispatch(signInWithFacebook());
-    navigate('/');
+    try {
+      const resultAction = await dispatch(signInWithFacebook());
+      //  Check if the action was rejected
+      if (signInWithFacebook.rejected.match(resultAction)) {
+        showToast("info", resultAction.error.message || "Something went wrong");
+        return;
+      }
+      //  Success case
+      showToast("success", `User is logged in successfully`);
+      navigate("/");
+    } catch (err: any) {
+      showToast("error", err);
+    }
   };
 
   return (
@@ -51,13 +74,23 @@ const SignUpScreen: React.FC = () => {
             validationSchema={validationSchema}
             onSubmit={async (values, { resetForm }) => {
               const user: User = { firstName: values.firstName, lastName: values.lastName, email: values.email, password: values.password };
-              await dispatch(signUpWithEmail(user));
-              console.log('Form Data:', values);
-              resetForm();
-              navigate('/');
+              try {
+                const resultAction = await dispatch(signUpWithEmail(user));
+                //  Check if the action was rejected
+                if (signUpWithEmail.rejected.match(resultAction)) {
+                  showToast("info", resultAction.error.message || "Something went wrong");
+                  return;
+                }
+                //  Success case
+                showToast("success", `${values.firstName} is logged in successfully`);
+                resetForm();
+                navigate("/");
+              } catch (err: any) {
+                showToast("error", err);
+              }
             }}
           >
-            {({ isValid, dirty }) => (
+            {({ isValid, dirty, isSubmitting }) => (
               <Form className='flex flex-col items-center justify-center'>
                 <section className='w-full my-2'>
                   <label className='text-start font-bold py-4'>First Name <span className='text-red-500'>*</span></label>
@@ -94,7 +127,7 @@ const SignUpScreen: React.FC = () => {
                 <button
                   className={`w-full h-[50px] my-8 rounded-2xl ${isValid && dirty ? 'bg-black text-slate-200' : 'bg-gray-400 text-gray-700'
                     }`}
-                  type="submit" disabled={!(isValid && dirty)}>Sign Up
+                  type="submit" disabled={!(isValid && dirty)}>{isSubmitting ? "Signing you in" : "Sign Up"}
                 </button>
               </Form>
             )}

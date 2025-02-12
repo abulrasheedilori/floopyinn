@@ -15,7 +15,6 @@ const ProgressBarIndicator: React.FC<ProgressBarProps> = ({
   color = 'purple',
   showLabel = true,
 }) => {
-  console.log("PROGREE BAR: ", progress)
   return (
     <section className={`w-full`}>
       {showLabel && (

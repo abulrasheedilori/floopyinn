@@ -8,6 +8,7 @@ import { auth } from '../../../../../common/firebase';
 import Select from 'react-select';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { fetchMembers } from '../../../../auth/authSlice';
+import { showToast } from '../../../../../common/middleware/showToast';
 
 interface AddTaskModalProps {
     isOpen: boolean;
@@ -22,18 +23,13 @@ export interface MemberOption {
 
 const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
     const dispatch = useAppDispatch();
-    const error = useAppSelector(state => state.auth.error)
+    const error = useAppSelector(state => state.tasks.error)
     const listOfMembers = useAppSelector(state => state.auth.members)
 
 
 
     useEffect(() => {
-        if (error) {
-            console.error("Fetch Members Error:", error);
-        }
-        console.log('Fetching members...');
         dispatch(fetchMembers());
-        console.log("Members List:", listOfMembers);
     }, [dispatch])
 
     if (!isOpen) return null;
@@ -70,7 +66,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                 label: Yup.string().required(),
             })
         ),
-        completionRate: Yup.number().min(0).max(100).required('Completion rate is required'),
+        completionRate: Yup.number().min(0, "Completion rate must be greater than or equal to 0").max(100, "Completion rate must be less than or equal to 100").required('Completion rate is required'),
         expiryDate: Yup.string().required('Expiry date is required'),
     });
 
@@ -88,12 +84,16 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                 completionRate: values.completionRate,
                 expiryDate: values.expiryDate,
             };
-            const result = await dispatch(createTask(task));
-            console.log("RESULT: ", result);
+            await dispatch(createTask(task));
+            if (!error) {
+                showToast("success", `${task.title} is added successfully`);
+            } else {
+                showToast("info", "An error occured, try again")
+            }
             resetForm();
             onClose();
-        } catch (error) {
-            console.error('Error adding task:', error);
+        } catch (error: any) {
+            showToast("info", error.message);
         }
     };
 
@@ -195,7 +195,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                                     type="number"
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                                 />
-                                <ErrorMessage name="completionRate" />
+                                <ErrorMessage name="completionRate" component="div" className="text-red-500 text-sm" />
                             </div>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700">Created At</label>
@@ -207,9 +207,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                                 <ErrorMessage name="expiryDate" component="div" className="text-red-500 text-sm" />
                             </div>
                             <button
-                                className={`w-full h-[50px] my-8 rounded-2xl ${isValid && dirty ? 'bg-black text-slate-200' : 'bg-gray-400 text-gray-700'
+                                className={`w-full h-[50px] my-8 rounded-2xl ${isValid ? 'bg-black text-slate-200' : 'bg-gray-400 text-gray-700'
                                     }`}
-                                type="submit" disabled={!isValid || !dirty}>{isSubmitting ? "Creating Task..." : "Sign Up"}
+                                type="submit" disabled={!isValid}>{isSubmitting ? "Creating Task..." : "Sign Up"}
                             </button>
                         </Form>)}
                 </Formik>

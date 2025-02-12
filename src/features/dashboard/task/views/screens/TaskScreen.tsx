@@ -40,22 +40,19 @@ const tabs: TaskTabItemType[] = [
 const TaskScreen: React.FC = () => {
   const [active, setActive] = useState<TaskTabType>(TaskTabType.TODO);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tasks, setTasks] = useState<TaskType[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const dispatch = useAppDispatch();
-  // const tasks = useAppSelector((state) => state.tasks.tasks);
+  const tasks = useAppSelector((state) => state.tasks.tasks);
   const darkMode = useAppSelector(state => state.auth.darkMode);
-
-
-
 
   useEffect(() => {
     const fetchNewTask = async () => {
       await dispatch(fetchTasks());
+      setLoading(false);
     }
     fetchNewTask();
-
-  }, [tasks]);
+  }, [dispatch]);
 
   const handleSetActive = (value: TaskTabType) => {
     setActive(value);
@@ -63,6 +60,12 @@ const TaskScreen: React.FC = () => {
 
   const showAddTaskModal = () => setIsModalOpen(true);
   const hideAddTaskModal = () => setIsModalOpen(false);
+
+  if (loading) {
+    return <div className="text-center text-gray-500">Loading tasks...</div>;
+  }
+
+  const filteredTasks = tasks.filter(task => task.flag === active);
 
 
   return (
@@ -80,22 +83,18 @@ const TaskScreen: React.FC = () => {
           <span>Add Task</span>
         </button>
       </section>
-      <section className="flex flex-row justify-around items-start flex-wrap gap-2 overflow-y-auto">
-        {tasks.map((task) => {
+      <section className="flex flex-row justify-items-start items-start flex-wrap gap-2 overflow-y-auto">
+        {filteredTasks.map((task) => {
           if (active === TaskTabType.TODO) {
-            dispatch(filterTasksByFlag(TaskTabType.TODO));
-            return <TodoCard key={task.id} />
+            return <TodoCard key={task.id} task={task} />;
           }
-          else if (active === TaskTabType.ONGOING) {
-            dispatch(filterTasksByFlag(TaskTabType.ONGOING));
-            return <OngoingTodoCard key={task.id} />
+          if (active === TaskTabType.ONGOING) {
+            return <OngoingTodoCard key={task.id} task={task} />;
           }
-          else if (active === TaskTabType.COMPLETED) {
-            dispatch(filterTasksByFlag(TaskTabType.COMPLETED));
-            return <OngoingTodoCard key={task.id} />
+          if (active === TaskTabType.COMPLETED) {
+            return <CompletedTodoCard key={task.id} task={task} />;
           }
-        })
-        }
+        })}
       </section>
     </section>
   )

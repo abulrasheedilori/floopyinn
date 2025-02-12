@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   createUserWithEmailAndPassword,
+  getAuth,
   signInWithEmailAndPassword,
   signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '../../common/firebase';
 import { facebookProvider, googleProvider, database } from '../../common/firebase';
-import { ref, set, push, get, update, remove } from 'firebase/database';
+import { ref, set, push, get, update, remove, getDatabase } from 'firebase/database';
 
 export type User = {
   id?: string | null;
@@ -41,16 +42,28 @@ const writeUserData = async (user: User) => {
 };
 
 // Thunk to fetch all members from the Realtime Database
-export const fetchMembers = createAsyncThunk('auth/fetchMembers', async () => {
-  const membersRef = ref(database, 'users');
-  const snapshot = await get(membersRef);
-  const members: User[] = [];
-  snapshot.forEach((childSnapshot) => {
-    const member = childSnapshot.val();
-    members.push(member);
-  });
-  return members;
+export const fetchMembers = createAsyncThunk("auth/fetchMembers", async (_, { rejectWithValue }) => {
+  try {
+    const auth = getAuth();
+    if (!auth.currentUser) {
+      return rejectWithValue("User is not authenticated");
+    }
+
+    const db = getDatabase();
+    const usersRef = ref(db, "users");
+    const snapshot = await get(usersRef);
+
+    if (!snapshot.exists()) {
+      return [];
+    }
+
+    const members = Object.values(snapshot.val()); // Convert Firebase object to array
+    return members;
+  } catch (error: any) {
+    return rejectWithValue(error.message);
+  }
 });
+
 
 export const signUpWithEmail = createAsyncThunk(
   'auth/signUpWithEmail',
@@ -158,7 +171,7 @@ const authSlice = createSlice({
       .addCase(fetchMembers.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(fetchMembers.fulfilled, (state, action) => {
+      .addCase(fetchMembers.fulfilled, (state, action: any) => {
         state.status = 'succeeded';
         state.members = action.payload;
       })

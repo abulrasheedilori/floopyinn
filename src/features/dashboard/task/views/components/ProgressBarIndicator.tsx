@@ -15,15 +15,16 @@ const ProgressBarIndicator: React.FC<ProgressBarProps> = ({
   color = 'purple',
   showLabel = true,
 }) => {
+  console.log("PROGREE BAR: ", progress)
   return (
-    <section className={`w-full `}>
-        {showLabel && (
-            <section className={`text-right mb-2 text-${color}-700 text-xs font-bold`}>
+    <section className={`w-full`}>
+      {showLabel && (
+        <section className={`text-right mb-2 text-${color}-700 text-xs font-bold`}>
           {`${progress}%`}
-            </section>
+        </section>
       )}
-      <section className={`w-full bg-${color}-200 rounded-2xl`}>
-        <section style={{ width: `${progress}%` }} className={`w-${progress} h-${height} bg-${color}-700  rounded-2xl`}/>
+      <section className={`w-full h-auto bg-${color}-200 rounded-2xl`}>
+        <section style={{ width: `${progress}%` }} className={`h-${height} bg-${color}-700 rounded-2xl`} />
       </section>
     </section>
   );

@@ -22,20 +22,21 @@ export interface MemberOption {
 
 const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
     const dispatch = useAppDispatch();
+    const error = useAppSelector(state => state.auth.error)
     const listOfMembers = useAppSelector(state => state.auth.members)
 
 
+
     useEffect(() => {
-        const getListOfMembers = async () => {
-            await dispatch(fetchMembers);
-        };
-        getListOfMembers();
-    }, [])
+        if (error) {
+            console.error("Fetch Members Error:", error);
+        }
+        console.log('Fetching members...');
+        dispatch(fetchMembers());
+        console.log("Members List:", listOfMembers);
+    }, [dispatch])
 
     if (!isOpen) return null;
-
-
-
 
     const initialValues: Omit<TaskType, 'id'> = {
         title: '',
@@ -62,7 +63,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
         updatedAt: Yup.number().nullable(),
         content: Yup.string().required('Content is required'),
         flag: Yup.mixed<TaskTabType>().oneOf(Object.values(TaskTabType)).required('Flag is required'),
-        teamLead: Yup.array().max(1, 'Select only one member').required('A member is required'),
+        teamLead: Yup.string().required('A member is required'),
         members: Yup.array().min(1, 'At least one member must be selected').of(
             Yup.object().shape({
                 value: Yup.string().required(),
@@ -87,7 +88,8 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                 completionRate: values.completionRate,
                 expiryDate: values.expiryDate,
             };
-            await dispatch(createTask(task));
+            const result = await dispatch(createTask(task));
+            console.log("RESULT: ", result);
             resetForm();
             onClose();
         } catch (error) {
@@ -96,7 +98,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-slate-50 bg-opacity-10 transition-all delay-500 ease-in">
+        <div className="fixed inset-0 flex items-center justify-center bg-slate-50 bg-opacity-10 transition-all delay-500 ease-in overflow-y-auto">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                 <section className='flex flex-row justify-between items-center'>
                     <span></span>
@@ -109,7 +111,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
-                    {({ setFieldValue, errors, touched, values }) => (
+                    {({ setFieldValue, errors, touched, values, isSubmitting, isValid, dirty }) => (
 
                         <Form>
                             <div className="mb-4">
@@ -198,12 +200,17 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700">Created At</label>
                                 <Field
-                                    name="createdAt"
+                                    name="expiryDate"
                                     type="date"
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                                 />
-                                <ErrorMessage name="createdAt" component="div" className="text-red-500 text-sm" />
+                                <ErrorMessage name="expiryDate" component="div" className="text-red-500 text-sm" />
                             </div>
+                            <button
+                                className={`w-full h-[50px] my-8 rounded-2xl ${isValid && dirty ? 'bg-black text-slate-200' : 'bg-gray-400 text-gray-700'
+                                    }`}
+                                type="submit" disabled={!isValid || !dirty}>{isSubmitting ? "Creating Task..." : "Sign Up"}
+                            </button>
                         </Form>)}
                 </Formik>
             </div>

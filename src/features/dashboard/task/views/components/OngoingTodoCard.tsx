@@ -3,7 +3,7 @@ import { BsThreeDots } from 'react-icons/bs'
 import { TaskType } from '../../taskSlice'
 import ProgressBarIndicator from './ProgressBarIndicator'
 
-const OngoingTodoCard: React.FC<{ task: TaskType }> = ({ task }) => {
+const OngoingTodoCard: React.FC<{ task: TaskType, showEditTaskModal: (task: TaskType) => void, onDelete: (id: string) => void }> = ({ task }) => {
 
   return (
     <section className='flex flex-col bg-slate-50 rounded-2xl hover:border hover:border-slate-400 hover:transition hover:duration-500 hover:ease-in-out'>

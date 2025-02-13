@@ -4,7 +4,7 @@ import { TaskType } from '../../taskSlice'
 import ProgressBarIndicator from './ProgressBarIndicator'
 import { memo } from 'react'
 
-const CompletedTodoCard: React.FC<{ task: TaskType }> = ({ task }) => {
+const CompletedTodoCard: React.FC<{ task: TaskType, showEditTaskModal: (task: TaskType) => void, onDelete: (id: string) => void }> = ({ task }) => {
   return (
     <section className='flex flex-col bg-slate-50 rounded-2xl hover:border hover:border-slate-400 hover:transition hover:duration-500 hover:ease-in-out'>
       <section className='w-72 flex flex-col border border-slate-200 shadow-sm rounded-2xl p-4'>

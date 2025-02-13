@@ -3,7 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch, useAppSelector } from '../../../../../common/reduxtk/hooks';
 import { createTask, TaskType } from '../../taskSlice';
-import { TaskTabType } from './TaskScreen';
+import { TaskTabType } from '../screens/TaskScreen';
 import { auth } from '../../../../../common/firebase';
 import Select from 'react-select';
 import { IoMdCloseCircleOutline } from 'react-icons/io';

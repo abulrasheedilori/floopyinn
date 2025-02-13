@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ref, push, get, update, remove } from 'firebase/database';
 import { database } from '../../../common/firebase';
 import { TaskTabType } from './views/screens/TaskScreen';
-import { MemberOption } from './views/screens/AddTaskModal';
+import { MemberOption } from './views/components/AddTaskModal';
 
 export enum StatusType {
   IDLE = "idle",

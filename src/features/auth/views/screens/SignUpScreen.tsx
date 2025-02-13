@@ -1,8 +1,8 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useAppDispatch, useAppSelector } from '../../../../common/reduxtk/hooks';
-import { signInWithFacebook, signInWithGoogle, signUpWithEmail, User } from '../../authSlice';
+import { useAppDispatch } from '../../../../common/reduxtk/hooks';
+import { facebookSignIn, googleSignIn, setAuthState, signUpWithEmail, User } from '../../authSlice';
 import { CustomFacebookLoginButton, CustomGoogleLoginButton } from '../components/CustomSocialMediaLoginButton.tsx';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../../../common/middleware/showToast.ts';
@@ -22,35 +22,30 @@ const SignUpScreen: React.FC = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const resultAction = await dispatch(signInWithGoogle());
+      const resultAction = await dispatch(googleSignIn());
       //  Check if the action was rejected
-      if (signInWithGoogle.rejected.match(resultAction)) {
-        showToast("info", resultAction.error.message || "Something went wrong");
+      if (googleSignIn.rejected.match(resultAction)) {
+        showToast("info", resultAction.payload?.toString() || "Something went wrong");
         return;
       }
       //  Success case
       showToast("success", `User is logged in successfully`);
       navigate("/");
     } catch (err: any) {
-      showToast("error", err);
+      showToast("error", err.message);
     }
   };
 
   const handleFacebookSignIn = async () => {
     try {
-      const resultAction = await dispatch(signInWithFacebook());
-      //  Check if the action was rejected
-      if (signInWithFacebook.rejected.match(resultAction)) {
-        showToast("info", resultAction.error.message || "Something went wrong");
-        return;
-      }
-      //  Success case
-      showToast("success", `User is logged in successfully`);
+      await dispatch(facebookSignIn());
+      showToast("success", "User logged in successfully");
       navigate("/");
-    } catch (err: any) {
-      showToast("error", err);
+    } catch (error: any) {
+      showToast("error", error.message || "Something went wrong");
     }
   };
+
 
   return (
     <section className='w-[100vw] h-[100vh] bg-slate-50 flex flex-col justify-center items-center'>

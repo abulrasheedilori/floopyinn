@@ -4,9 +4,7 @@ import TodoCard from "../components/TodoCard";
 import { useAppDispatch, useAppSelector } from "../../../../../common/reduxtk/hooks";
 import OngoingTodoCard from "../components/OngoingTodoCard";
 import CompletedTodoCard from "../components/CompletedTodoCard";
-import { database } from "../../../../../common/firebase";
-import { onValue, ref } from "firebase/database";
-import { fetchTasks, filterTasksByFlag, TaskType } from "../../taskSlice";
+import { fetchTasks } from "../../taskSlice";
 import AddTaskModal from "./AddTaskModal";
 
 export enum TaskTabType {

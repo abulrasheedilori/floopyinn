@@ -7,10 +7,11 @@ import {
 } from 'firebase/auth';
 import { auth } from '../../common/firebase';
 import { facebookProvider, googleProvider, database } from '../../common/firebase';
-import { ref, set, push, get, update, remove, getDatabase } from 'firebase/database';
-import axios from 'axios';
+import { ref, set, get, update, remove, getDatabase } from 'firebase/database';
+import { StatusType } from '../dashboard/task/taskSlice';
+import { fetchSignInMethodsForEmail } from "firebase/auth";
 
-const API_URL = "https://floopyinn-433b3-default-rtdb.firebaseio.com/users";
+
 export type User = {
   id?: string | null;
   firstName: string | null;
@@ -104,81 +105,80 @@ export const signInWithEmail = createAsyncThunk(
   }
 );
 
-// Thunk to sign in a user with Google
-export const signInWithGoogle = createAsyncThunk('auth/signInWithGoogle', async () => {
-  const userCredential = await signInWithPopup(auth, googleProvider);
-  const firebaseUser = userCredential.user;
-  const user: User = {
-    id: firebaseUser.uid,
-    firstName: firebaseUser.displayName?.split(' ')[0] || '',
-    lastName: firebaseUser.displayName?.split(' ')[1] || '',
-    email: firebaseUser.email || '',
-    photoURL: firebaseUser.photoURL || ""
-  };
-  await writeUserData(user);
-  return user;
-});
-
-// Thunk to sign in a user with Facebook
-export const signInWithFacebook = createAsyncThunk('auth/signInWithFacebook', async () => {
-  const userCredential = await signInWithPopup(auth, facebookProvider);
-  const firebaseUser = userCredential.user;
-  const user: User = {
-    id: firebaseUser.uid,
-    firstName: firebaseUser.displayName?.split(' ')[0] || '',
-    lastName: firebaseUser.displayName?.split(' ')[1] || '',
-    email: firebaseUser.email || '',
-    photoURL: firebaseUser.photoURL || ""
-  };
-  await writeUserData(user);
-  return user;
-});
-
-// 🔹 Helper function to check if the user exists in the database
-const checkUserInDatabase = async (uid: string) => {
-  try {
-    const response = await axios.get(`${API_URL}/${uid}`);
-    return response.data; // User exists
-  } catch (error) {
-    return null; // User does not exist
-  }
-};
-
 // 🔹 Google Sign-In Thunk
 export const googleSignIn = createAsyncThunk('auth/googleSignIn', async (_, { rejectWithValue }) => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
-    // Check if the user exists in the database
-    const existingUser = await checkUserInDatabase(user.uid);
-    if (!existingUser) {
-      throw new Error('User not found in database. Kindly sign up');
+    if (!user) {
+      throw new Error("Invalid Google login credentials.");
     }
 
-    return existingUser; // Proceed with login
+    // Reference to user data in Firebase database
+    const userRef = ref(database, `users/${user.uid}`);
+
+    // Check if the user exists
+    const snapshot = await get(userRef);
+    const newUser: User = {
+      id: user.uid,
+      firstName: user.displayName?.split(" ")[0] || "",
+      lastName: user.displayName?.split(" ")[1] || "",
+      email: user.email || "",
+      photoURL: user.photoURL || "",
+    };
+    if (!snapshot.exists()) {
+      // If user does not exist, create new user in Firebase
+      await set(userRef, newUser);
+    }
+    return newUser;
   } catch (error: any) {
     return rejectWithValue(error.message);
   }
 });
 
 // 🔹 Facebook Sign-In Thunk
-export const facebookSignIn = createAsyncThunk('auth/facebookSignIn', async (_, { rejectWithValue }) => {
-  try {
-    const result = await signInWithPopup(auth, facebookProvider);
-    const user = result.user;
+export const facebookSignIn = createAsyncThunk(
+  'auth/facebookSignIn',
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      const result = await signInWithPopup(auth, facebookProvider);
+      const user = result.user;
 
-    // Check if the user exists in the database
-    const existingUser = await checkUserInDatabase(user.uid);
-    if (!existingUser) {
-      throw new Error('User not found in database');
+      // Reference to user data in Firebase Realtime Database
+      const userRef = ref(database, `users/${user.uid}`);
+      const snapshot = await get(userRef);
+
+      const newUser: User = {
+        id: user.uid,
+        firstName: user.displayName?.split(" ")[0] || "",
+        lastName: user.displayName?.split(" ")[1] || "",
+        email: user.email,
+        photoURL: user.photoURL || "",
+      };
+
+      if (snapshot.exists()) {
+        // User exists, update the details instead of rejecting
+        await update(userRef, newUser);
+      } else {
+        // User does not exist, create new record
+        await set(userRef, newUser);
+      }
+      console.error("Facebook Sign-In Success");
+
+      return newUser;
+    } catch (error: any) {
+      console.error("Facebook Sign-In Error:", error);
+
+      if (error.code === "auth/account-exists-with-different-credential") {
+        return rejectWithValue("Seems you already register with other provider. Kindly log in with it.");
+
+      }
+      return rejectWithValue("Facebook authentication failed. Please try again.");
     }
-
-    return existingUser; // Proceed with login
-  } catch (error: any) {
-    return rejectWithValue(error.message);
   }
-});
+);
+
 
 // Thunk to update user data
 export const updateUserData = createAsyncThunk(
@@ -209,68 +209,79 @@ const authSlice = createSlice({
     toggleTheme(state) {
       if (state.darkMode) { state.darkMode = false; } else { state.darkMode = true; }
     },
+    setAuthState: (state, action: PayloadAction<boolean>) => {
+      state.isAuthenticated = action.payload;
+
+    },
+    setUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMembers.pending, (state) => {
-        state.status = 'loading';
+        state.status = StatusType.LOADING;
       })
       .addCase(fetchMembers.fulfilled, (state, action: any) => {
-        state.status = 'succeeded';
+        state.status = StatusType.SUCCEEDED;
         state.members = action.payload;
       })
       .addCase(fetchMembers.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = StatusType.FAILED;
         state.error = action.error.message || null;
       })
+
       .addCase(signUpWithEmail.pending, (state) => {
-        state.status = 'loading';
+        state.status = StatusType.LOADING;
       })
       .addCase(signUpWithEmail.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.status = StatusType.SUCCEEDED;
         state.isAuthenticated = true;
         state.user = action.payload;
       })
       .addCase(signUpWithEmail.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = StatusType.FAILED;
+        state.isAuthenticated = false;
         state.error = action.error.message || null;
       })
+
       .addCase(signInWithEmail.pending, (state) => {
-        state.status = 'loading';
+        state.status = StatusType.LOADING;
       })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.status = StatusType.SUCCEEDED;
         state.isAuthenticated = true;
         state.user = action.payload;
       })
       .addCase(signInWithEmail.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = StatusType.FAILED;
+        state.isAuthenticated = false;
         state.error = action.error.message || null;
       })
-      .addCase(signInWithGoogle.fulfilled, (state, action) => {
-        state.isAuthenticated = true;
-        state.user = action.payload;
-      })
-      .addCase(signInWithFacebook.fulfilled, (state, action) => {
-        state.isAuthenticated = true;
-        state.user = action.payload;
-      })
+
       .addCase(googleSignIn.fulfilled, (state, action) => {
-        state.isAuthenticated = true;
-        state.user = action.payload;
-      })
-      .addCase(facebookSignIn.fulfilled, (state, action) => {
+        state.status = StatusType.SUCCEEDED;
         state.isAuthenticated = true;
         state.user = action.payload;
       })
       .addCase(googleSignIn.rejected, (state, action) => {
+        state.status = StatusType.FAILED;
+        state.isAuthenticated = false;
         state.error = action.payload as string;
       })
+
+      .addCase(facebookSignIn.fulfilled, (state, action) => {
+        state.status = StatusType.SUCCEEDED;
+        state.isAuthenticated = true;
+        state.user = action.payload;
+      })
       .addCase(facebookSignIn.rejected, (state, action) => {
+        state.status = StatusType.FAILED;
+        state.isAuthenticated = false;
         state.error = action.payload as string;
       });
   },
 });
 
-export const { signOut, toggleTheme } = authSlice.actions;
+export const { signOut, toggleTheme, setUser, setAuthState } = authSlice.actions;
 export default authSlice.reducer;

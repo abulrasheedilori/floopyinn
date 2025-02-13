@@ -3,8 +3,7 @@ import React from 'react';
 import Topbar from './task/views/components/Topbar';
 import Sidebar from './task/views/components/Sidebar';
 import { Outlet } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../common/reduxtk/hooks';
-import { toggleTheme } from '../auth/authSlice';
+import { useAppSelector } from '../../common/reduxtk/hooks';
 
 const DashboardLayout: React.FC = () => {
   const darkMode = useAppSelector(state => state.auth.darkMode);

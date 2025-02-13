@@ -1,8 +1,7 @@
 import { IoNotificationsOutline } from "react-icons/io5";
 import { FaRegMoon, FaMoon } from "react-icons/fa";
-import { RxAvatar } from "react-icons/rx";
 import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from "../../../../../common/reduxtk/hooks";
 import { signOut, toggleTheme } from "../../../../auth/authSlice";
 
@@ -58,7 +57,7 @@ const Topbar: React.FC = () => {
             {showDropdown ? <RiArrowDropUpLine size={24} onClick={() => setShowDropdown(false)} /> : <RiArrowDropDownLine size={24} onClick={() => setShowDropdown(true)} />}
           </button>
           {/* Dropdown menu */}
-          {showDropdown && <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg">
+          {showDropdown && <div className="absolute right-0 mt-2 z-50 w-48 bg-white border border-slate-200 rounded-lg shadow-lg">
             <a href="/account" className="block px-4 py-2 hover:bg-black hover:text-slate-50 hover:rounded-lg">
               Profile
             </a>

@@ -111,7 +111,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
-                    {({ setFieldValue, errors, touched, values, isSubmitting, isValid, dirty }) => (
+                    {({ setFieldValue, errors, touched, values, isSubmitting, isValid }) => (
 
                         <Form>
                             <div className="mb-4">

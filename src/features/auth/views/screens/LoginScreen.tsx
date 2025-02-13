@@ -6,12 +6,22 @@ import { showToast } from '../../../../common/middleware/showToast.ts';
 import { auth } from '../../../../common/firebase.ts';
 import { CustomFacebookLoginButton, CustomGoogleLoginButton } from '../components/CustomSocialMediaLoginButton.tsx.tsx';
 import { facebookSignIn, googleSignIn } from '../../authSlice.ts';
-import { useAppDispatch } from '../../../../common/reduxtk/hooks.ts';
+import { useAppDispatch, useAppSelector } from '../../../../common/reduxtk/hooks.ts';
 import floopyinnLogo from "../../../../assets/playstore.png";
+import { useEffect } from 'react';
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email format').required('Email is required'),
@@ -43,10 +53,11 @@ const Login = () => {
   // 🔹 Handle Facebook sign-in
   const handleFacebookSignIn = async () => {
     try {
-      await dispatch(facebookSignIn())
-      navigate('/');
-    } catch (error: any) {
-      showToast("error", error.message);
+      await dispatch(facebookSignIn());
+      showToast("success", "User logged in successfully");
+      navigate("/");
+    } catch (err: any) {
+      showToast("error", err.message || "Something went wrong");
     }
   };
 

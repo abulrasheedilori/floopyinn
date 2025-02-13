@@ -1,4 +1,6 @@
 Project Name: Floopyinn
+
+Description:
 A project management tools that allow members to manage their tasks, ensure completion in due time, messaging etc.
 
 Table of Contents
@@ -15,7 +17,9 @@ Project Description
 This project is a web application developed using React, TypeScript, Tailwind CSS, and Firebase. It features a user authentication system with Facebook and Google login options, a responsive dashboard, and a task management interface. The design closely follows the provided Figma design, ensuring a clean and professional UI.
 
 Features
-  User Authentication:
+User Authentication:
+- Email and Password login
+- Maual registraton
 - Sign up and log in using Facebook or Google accounts.
 - Form validation for user inputs.
 
@@ -27,17 +31,17 @@ Task Management:
 - Create, update, and delete tasks.
 - Organize tasks into categories: To Do, On Going, and Complete.
 - Technologies Used
-- Frontend:
+- Theme Management
 
-Technology used
+Frontend: Technology Used
 - React with TypeScript
 - Tailwind CSS
-- Backend:
+
+Backend Technology Used:
   - Firebase Authentication
   - Firebase Firestore
 
 Installation
-
 - Clone the Repository:
   git clone https://github.com/abulrasheedilori/floopyinn.git
 
@@ -47,49 +51,11 @@ cd floopyinn
 Install Dependencies:
   - npm install
 
-- Set Up Firebase:
-  - Create a Firebase project in the Firebase Console.
-  - Enable Authentication methods (Facebook and Google) in the Firebase Authentication section.
-  - Add Firebase to your web app and obtain the configuration object.
-  - Create a firebase.ts file in the src directory and add your Firebase configuration:
-- typescript
+Run project on local
+- npm run dev
 
-
-import { initializeApp } from "firebase/app";
-import { getAuth, FacebookAuthProvider, GoogleAuthProvider } from "firebase/auth";
-
-const firebaseConfig = {
-  // Your Firebase config
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const facebookProvider = new FacebookAuthProvider();
-const googleProvider = new GoogleAuthProvider();
-
-export { auth, facebookProvider, googleProvider };
-
-Start the Development Server:
-
-npm run dev
-
-note: The application will be accessible at http://localhost:3000.
-
-Usage
-Authentication:
-
-  - Use the "Continue with Facebook" or "Continue with Google" buttons to sign up or log in.
-  - Fill in the form with your name, email, and password to create a new account.
-
-Dashboard:
-  - Use the search bar to find tasks.
-  - Manage your profile by clicking on your username.
-Task Management:
-  - Add new tasks by clicking the "Add Task" button.
-  - Organize tasks into categories: To Do, On Going, and Complete.
-
-Contributing
-  - Contributions are welcome! Please fork the repository, create a new branch, and submit a pull request with your changes.
+Live Project Url
+- https://floopyinn-433b3.web.app
 
 License
   - This project is licensed under the MIT License.

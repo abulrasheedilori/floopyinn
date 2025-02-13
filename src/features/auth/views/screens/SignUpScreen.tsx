@@ -2,7 +2,7 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '../../../../common/reduxtk/hooks';
-import { facebookSignIn, googleSignIn, setAuthState, signUpWithEmail, User } from '../../authSlice';
+import { facebookSignIn, googleSignIn, signUpWithEmail, User } from '../../authSlice';
 import { CustomFacebookLoginButton, CustomGoogleLoginButton } from '../components/CustomSocialMediaLoginButton.tsx';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../../../common/middleware/showToast.ts';

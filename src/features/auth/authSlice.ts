@@ -9,7 +9,6 @@ import { auth } from '../../common/firebase';
 import { facebookProvider, googleProvider, database } from '../../common/firebase';
 import { ref, set, get, update, remove, getDatabase } from 'firebase/database';
 import { StatusType } from '../dashboard/task/taskSlice';
-import { fetchSignInMethodsForEmail } from "firebase/auth";
 
 
 export type User = {
@@ -140,7 +139,7 @@ export const googleSignIn = createAsyncThunk('auth/googleSignIn', async (_, { re
 // 🔹 Facebook Sign-In Thunk
 export const facebookSignIn = createAsyncThunk(
   'auth/facebookSignIn',
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const result = await signInWithPopup(auth, facebookProvider);
       const user = result.user;

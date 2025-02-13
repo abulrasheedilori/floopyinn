@@ -9,7 +9,6 @@ export const getTimeRemaining = (createdAt: string, expiredAt: string): string =
   }
 
   // Calculate total duration and remaining time in milliseconds
-  const totalDuration = expiredDate.getTime() - createdDate.getTime();
   const timeRemaining = expiredDate.getTime() - now.getTime();
 
   if (timeRemaining <= 0) {

@@ -4,6 +4,7 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
 
+//store this in real production env and ignore it so you dont push sensitive items to public space
 const firebaseConfig = {
   apiKey: "AIzaSyAQj8OiMjIK_wogU2RFp5mVgacq02cwOlQ",
   authDomain: "floopyinn-433b3.firebaseapp.com",

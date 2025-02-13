@@ -1,8 +1,9 @@
 {
   "hosting": {
-    "public": "./public",
+    "public": "dist",
     "ignore": [
       "firebase.json",
+      "firebas.ts",
       "**/.*",
       "**/node_modules/**"
     ],

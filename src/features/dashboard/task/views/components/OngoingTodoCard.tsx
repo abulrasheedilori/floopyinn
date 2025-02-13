@@ -1,8 +1,6 @@
-import { IoIosCheckmarkCircle } from 'react-icons/io'
 import AvatarGroup from './AvatarGroup'
 import { BsThreeDots } from 'react-icons/bs'
 import { TaskType } from '../../taskSlice'
-import { getTimeRemaining } from '../../../../../common/middleware/getTimeRemaining'
 import ProgressBarIndicator from './ProgressBarIndicator'
 
 const OngoingTodoCard: React.FC<{ task: TaskType }> = ({ task }) => {

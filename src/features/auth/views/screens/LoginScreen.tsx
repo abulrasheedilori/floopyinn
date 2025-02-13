@@ -50,14 +50,19 @@ const Login = () => {
     }
   };
 
-  // 🔹 Handle Facebook sign-in
   const handleFacebookSignIn = async () => {
     try {
-      await dispatch(facebookSignIn());
+      const resultAction = await dispatch(facebookSignIn());
+
+      if (facebookSignIn.rejected.match(resultAction)) {
+        showToast("error", resultAction.payload?.toString() || "Facebook sign-in failed");
+        return;
+      }
+
       showToast("success", "User logged in successfully");
       navigate("/");
-    } catch (err: any) {
-      showToast("error", err.message || "Something went wrong");
+    } catch (error: any) {
+      showToast("error", error.message || "Something went wrong");
     }
   };
 

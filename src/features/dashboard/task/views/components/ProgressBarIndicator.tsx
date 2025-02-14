@@ -9,26 +9,38 @@ interface ProgressBarProps {
   showLabel?: boolean; // Whether to show the progress label
 }
 
+const colorClasses: { [key: string]: string } = {
+  purple: 'purple',
+  blue: 'blue',
+  red: 'red',
+  green: 'green',
+  yellow: 'yellow',
+  gray: 'gray',
+};
+
 const ProgressBarIndicator: React.FC<ProgressBarProps> = ({
   progress,
   height = 2,
   color = 'purple',
   showLabel = true,
 }) => {
+  const tailwindColor = colorClasses[color] || 'purple'; // Fallback to purple
+
   return (
-    <section className={`w-full`}>
+    <section className="w-full">
       {showLabel && (
-        <section className={`text-right mb-2 text-${color}-700 text-xs font-bold`}>
+        <section className={`text-right mb-2 text-${tailwindColor}-700 text-xs font-bold`}>
           {`${progress}%`}
         </section>
       )}
-      <section className={`w-full h-auto bg-${color}-200 rounded-2xl`}>
-        <section style={{ width: `${progress}%` }} className={`h-${height} bg-${color}-700 rounded-2xl`} />
+      <section className={`w-full h-fit bg-${tailwindColor}-200 rounded-2xl`}>
+        <section
+          style={{ width: `${progress}%` }}
+          className={`h-${height} border-2 border-${tailwindColor}-700 bg-${tailwindColor}-700 rounded-2xl`}
+        />
       </section>
     </section>
   );
 };
 
 export default memo(ProgressBarIndicator);
-
-

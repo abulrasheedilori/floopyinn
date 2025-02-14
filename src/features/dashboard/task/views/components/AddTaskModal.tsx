@@ -34,6 +34,35 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
 
     if (!isOpen) return null;
 
+    const userOptions: MemberOption[] = listOfMembers.map((user) => ({
+        value: user.id || '',
+        label: `${user.firstName} ${user.lastName}`,
+    }));
+
+    const getTaskStatus = (completionRate: number) => {
+        if (completionRate === 0) return TaskTabType.TODO;
+        if (completionRate > 0 && completionRate < 100) return TaskTabType.ONGOING;
+        return TaskTabType.COMPLETED;
+    };
+
+
+    const validationSchema = Yup.object().shape({
+        title: Yup.string().required('Title is required'),
+        createdAt: Yup.string().required('Creation date is required'),
+        updatedAt: Yup.number().nullable(),
+        content: Yup.string().required('Content is required'),
+        // flag: Yup.mixed<TaskTabType>().oneOf(Object.values(TaskTabType)).required('Flag is required'),
+        teamLead: Yup.string().required('A member is required'),
+        members: Yup.array().min(1, 'At least one member must be selected').of(
+            Yup.object().shape({
+                value: Yup.string().required(),
+                label: Yup.string().required(),
+            })
+        ),
+        completionRate: Yup.number().min(0, "Completion rate must be greater than or equal to 0").max(100, "Completion rate must be less than or equal to 100").required('Completion rate is required'),
+        expiryDate: Yup.string().required('Expiry date is required'),
+    });
+
     const initialValues: Omit<TaskType, 'id'> = {
         title: '',
         createdBy: "",
@@ -47,29 +76,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
         expiryDate: '',
     };
 
-    const userOptions: MemberOption[] = listOfMembers.map((user) => ({
-        value: user.id || '',
-        label: `${user.firstName} ${user.lastName}`,
-    }));
-
-
-    const validationSchema = Yup.object().shape({
-        title: Yup.string().required('Title is required'),
-        createdAt: Yup.string().required('Creation date is required'),
-        updatedAt: Yup.number().nullable(),
-        content: Yup.string().required('Content is required'),
-        flag: Yup.mixed<TaskTabType>().oneOf(Object.values(TaskTabType)).required('Flag is required'),
-        teamLead: Yup.string().required('A member is required'),
-        members: Yup.array().min(1, 'At least one member must be selected').of(
-            Yup.object().shape({
-                value: Yup.string().required(),
-                label: Yup.string().required(),
-            })
-        ),
-        completionRate: Yup.number().min(0, "Completion rate must be greater than or equal to 0").max(100, "Completion rate must be less than or equal to 100").required('Completion rate is required'),
-        expiryDate: Yup.string().required('Expiry date is required'),
-    });
-
     const handleSubmit = async (values: Omit<TaskType, 'id'>, { resetForm }: any) => {
         try {
             const task: TaskType = {
@@ -78,7 +84,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                 createdBy: auth.currentUser?.displayName || null,
                 updatedAt: values.updatedAt,
                 content: values.content,
-                flag: values.flag,
+                flag: getTaskStatus(values.completionRate || 0),
                 teamLead: values.teamLead,
                 members: values.members,
                 completionRate: values.completionRate,
@@ -98,9 +104,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-slate-50 bg-opacity-10 transition-all delay-500 ease-in overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50 bg-opacity-10 transition-all delay-500 ease-in overflow-y-auto">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                <section className='flex flex-row justify-between items-center'>
+                <section className='flex flex-row justify-between items-center border-b-2 mb-4 border-slate-200'>
                     <span></span>
                     <span className="text-xl font-bold mb-4">Add New Task</span>
                     <IoMdCloseCircleOutline size={24} color='red' onClick={onClose} />
@@ -140,21 +146,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                                 />
                                 <ErrorMessage name="content" component="div" className="text-red-500 text-sm" />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Flag</label>
-                                <Field
-                                    name="flag"
-                                    as="select"
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                                >
-                                    {Object.values(TaskTabType).map((type) => (
-                                        <option key={type} value={type}>
-                                            {type}
-                                        </option>
-                                    ))}
-                                </Field>
-                                <ErrorMessage name="flag" component="div" className="text-red-500 text-sm" />
                             </div>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700">Team Lead</label>

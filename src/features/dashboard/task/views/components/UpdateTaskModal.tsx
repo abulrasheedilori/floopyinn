@@ -80,7 +80,7 @@ const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClose, task
     return (
         <div className="fixed z-50 inset-0 flex items-center justify-center bg-slate-50 bg-opacity-10 transition-all delay-500 ease-in overflow-y-auto">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                <section className='flex flex-row justify-between items-center'>
+                <section className='flex mb-4 flex-row justify-between items-center border-b-2 border-slate-200'>
                     <span className="text-xl font-bold mb-4">Edit Task</span>
                     <IoClose size={36} color='red' onClick={onClose} />
                 </section>
@@ -101,7 +101,6 @@ const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClose, task
                     {({ setFieldValue, values, errors, touched, isValid, isSubmitting }) => (
                         <Form>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Title</label>
                                 <span>{values.title}</span>
                             </div>
                             <div className="mb-4">

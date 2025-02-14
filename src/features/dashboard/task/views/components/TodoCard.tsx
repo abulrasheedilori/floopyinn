@@ -20,7 +20,7 @@ const TodoCard: React.FC<TodoStatusTaskProps> = ({ task, onDelete, onUpdate }) =
   const timeRem = getTimeRemaining(task.createdAt, task.expiryDate);
 
   return (
-    <section className='relative flex flex-col bg-slate-50 rounded-2xl hover:border hover:border-slate-400 hover:transition hover:duration-500 hover:ease-in-out'>
+    <section className='relative flex flex-row bg-slate-50 rounded-2xl hover:border hover:border-slate-400 hover:transition hover:duration-500 hover:ease-in-out'>
       {showMenu && task && <TaskMenuModal task={task} hideMenu={handleCloseMenu} onUpdate={onUpdate} onDelete={onDelete} />}
       <section className='w-72 flex flex-col border border-slate-200 shadow-sm rounded-2xl p-4'>
         <section className='flex flex-row items-center justify-between'>

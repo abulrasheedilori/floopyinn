@@ -13,7 +13,7 @@ const OngoingTodoCard: React.FC<TodoStatusTaskProps> = ({ task, onUpdate, onDele
 
   return (
     <section className=' flex flex-col bg-slate-50 rounded-2xl hover:border hover:border-slate-400 hover:transition hover:duration-500 hover:ease-in-out'>
-      <section className='relative w-fit flex flex-col border border-slate-200 shadow-sm rounded-2xl p-4'>
+      <section className='relative w-72 flex flex-col border border-slate-200 shadow-sm rounded-2xl p-4'>
         <section className='flex flex-row items-center justify-between'>
           <span className="my-2 text-black font-extrabold">{task.title}</span>
           <BsThreeDots size={24} onClick={handleShowMenu} />

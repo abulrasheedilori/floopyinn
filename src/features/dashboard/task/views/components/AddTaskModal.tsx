@@ -176,18 +176,17 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                                 <Select
                                     isMulti
                                     name="members"
-                                    options={userOptions}
+                                    options={userOptions.filter(option => !values.members.some(member => member.value === option.value))}
+                                    value={values.members}
+                                    onChange={selectedOptions => setFieldValue('members', selectedOptions)}
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                                     classNamePrefix="select"
-                                    value={values.members}
-                                    onChange={(selectedOptions) => {
-                                        setFieldValue('members', selectedOptions);
-                                    }}
                                 />
-                                {errors && errors.members && touched.members ? (
-                                    <div className="text-red-500 text-sm">{errors.members.toString()}</div>
-                                ) : null}
+                                {errors.members && touched.members && (
+                                    <div className="text-red-500 text-xs">{errors.members.toString()}</div>
+                                )}
                             </div>
+
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700">Completion Rate</label>
                                 <Field

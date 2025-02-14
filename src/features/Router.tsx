@@ -7,6 +7,7 @@ import DashboardLayout from './dashboard/DashboardLayout';
 import Toast from '../common/components/Toast';
 import LoginScreen from './auth/views/screens/LoginScreen';
 import { navItems } from './navigation/navItems';
+import TaskScreen from './dashboard/task/views/screens/TaskScreen';
 
 const RouterLayout = () => {
     const isAuthenticated = useAppSelector((state: RootState) => state.auth.isAuthenticated);
@@ -15,29 +16,11 @@ const RouterLayout = () => {
         <section>
             <Toast />
             <BrowserRouter>
-                {/* <Routes>
-                    {isAuthenticated ? (
-                        <>
-                            <Route path="/" element={<DashboardLayout />}>
-                                <Route index element={<OverviewScreen />} />
-                                {navItems.map((item) => (
-                                    <Route key={item.name} path={item.path} element={item.element} />
-                                ))}
-                            </Route>
-                        </>
-                    ) : (
-                        <>
-                            <Route path="/" element={<SignUpScreen />} />
-                            <Route path="/login" element={<LoginScreen />} />
-                        </>
-                    )}
-                    <Route path="*" element={<SignUpScreen />} />
-                </Routes> */}
                 <Routes>
                     {isAuthenticated ? (
                         <>
                             <Route path="/" element={<DashboardLayout />}>
-                                <Route index element={<OverviewScreen />} />
+                                <Route index element={<TaskScreen />} />
                                 {navItems.map((item) => (
                                     <Route key={item.name} path={item.path} element={item.element}>
                                         {item.nestedItem.map((subItem) => (
@@ -49,7 +32,7 @@ const RouterLayout = () => {
                         </>
                     ) : (
                         <>
-                            <Route path="/" element={<Navigate to="/login" replace />} />
+                            <Route path="/" element={<Navigate to="/signup" replace />} />
                             <Route path="/login" element={<LoginScreen />} />
                             <Route path="/signup" element={<SignUpScreen />} />
                         </>

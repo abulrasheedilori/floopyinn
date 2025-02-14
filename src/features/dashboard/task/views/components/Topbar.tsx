@@ -4,9 +4,12 @@ import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from "../../../../../common/reduxtk/hooks";
 import { signOut, toggleTheme } from "../../../../auth/authSlice";
+import { fetchTasks, searchTasks } from "../../taskSlice";
 
 const Topbar: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
 
   const dispatch = useAppDispatch();
   const { user, darkMode } = useAppSelector(state => state.auth);
@@ -16,6 +19,15 @@ const Topbar: React.FC = () => {
   const changeTheme = () => {
     dispatch(toggleTheme());
   }
+
+  const searchQueryFromTasks = (searchString: string) => {
+    setSearchQuery(searchString);
+    dispatch(searchTasks(searchQuery));
+
+    if (!searchString) {
+      dispatch(fetchTasks()); // Reload tasks if search is cleared
+    }
+  };
 
   return (
     <div className={`flex justify-between items-center p-4 ${darkMode ? "bg-gray-300" : "bg-slate-50"}`}>
@@ -37,6 +49,8 @@ const Topbar: React.FC = () => {
         </div>
         <input
           type="text"
+          value={searchQuery}
+          onChange={(e) => searchQueryFromTasks(e.target.value)}
           placeholder="Search here ..."
           className="w-full px-10 py-2 border bg-white border-slate-300 rounded-2xl focus:outline-slate-400"
         />
@@ -47,9 +61,9 @@ const Topbar: React.FC = () => {
           <IoNotificationsOutline size={32} />
           <span className="absolute top-0 right-0 inline-block w-4 h-4 bg-red-600 text-xs text-slate-50 rounded-full">12</span>
         </button>
-
+        {/* Theme switch */}
         {darkMode ? <FaRegMoon size={24} onClick={changeTheme} /> : <FaMoon size={24} onClick={changeTheme} />}
-
+        {/* Profile section */}
         <div className={`relative ${darkMode ? "bg-gray-300" : null}`}>
           <button className="flex items-center space-x-2">
             <img src={user?.photoURL} alt="user photo" className="w-8 h-8 rounded-full" />

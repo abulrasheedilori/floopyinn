@@ -4,10 +4,10 @@ import * as Yup from 'yup';
 import { useAppDispatch, useAppSelector } from '../../../../../common/reduxtk/hooks';
 import { updateTask, TaskType } from '../../taskSlice';
 import Select from 'react-select';
-import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { fetchMembers } from '../../../../auth/authSlice';
 import { showToast } from '../../../../../common/middleware/showToast';
 import { TaskTabType } from '../screens/TaskScreen';
+import { IoClose } from 'react-icons/io5';
 
 interface UpdateTaskModalProps {
     isOpen: boolean;
@@ -46,23 +46,30 @@ const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClose, task
         expiryDate: Yup.string().required('Expiry date is required'),
     });
 
+    const getTaskStatus = (completionRate: number) => {
+        if (completionRate === 0) return TaskTabType.TODO;
+        if (completionRate > 0 && completionRate < 100) return TaskTabType.ONGOING;
+        return TaskTabType.COMPLETED;
+    };
+
     const handleSubmit = async (values: Partial<TaskType>, { resetForm }: any) => {
         try {
-            const task: TaskType = {
-                id: values.id,
-                createdAt: values.createdAt!,
+            const updatedTask: TaskType = {
                 title: values.title || "",
                 createdBy: values.createdBy || new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 content: values.content || "",
-                flag: values.flag || TaskTabType.TODO,
+                flag: getTaskStatus(values.completionRate || 0),
                 teamLead: values.teamLead || "",
                 members: values.members || [],
                 completionRate: values.completionRate || 0,
-                expiryDate: values.expiryDate || new Date().toISOString()
-            }
-            await dispatch(updateTask(task));
-            showToast("success", `${task.title} updated successfully`);
+                expiryDate: values.expiryDate || new Date().toISOString(),
+                createdAt: values.createdAt || new Date().toISOString(),
+                id: values.id
+            };
+            const res = await dispatch(updateTask(updatedTask));
+            console.log("RESULT: ", res);
+            showToast("success", `${updatedTask.title} updated successfully`);
             resetForm();
             onClose();
         } catch (error: any) {
@@ -71,18 +78,19 @@ const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClose, task
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-slate-50 bg-opacity-10 transition-all delay-500 ease-in overflow-y-auto">
+        <div className="fixed z-50 inset-0 flex items-center justify-center bg-slate-50 bg-opacity-10 transition-all delay-500 ease-in overflow-y-auto">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                 <section className='flex flex-row justify-between items-center'>
-                    <span></span>
                     <span className="text-xl font-bold mb-4">Edit Task</span>
-                    <IoMdCloseCircleOutline size={24} color='red' onClick={onClose} />
+                    <IoClose size={36} color='red' onClick={onClose} />
                 </section>
-
                 <Formik
                     initialValues={{
+                        title: task.title,
                         content: task.content,
                         teamLead: task.teamLead,
+                        createdAt: task.createdAt,
+                        id: task.id,
                         members: task.members,
                         completionRate: task.completionRate,
                         expiryDate: task.expiryDate,
@@ -93,14 +101,8 @@ const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClose, task
                     {({ setFieldValue, values, errors, touched, isValid, isSubmitting }) => (
                         <Form>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Content</label>
-                                <Field
-                                    name="title"
-                                    as="text"
-                                    disabled
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                                />
-                                <ErrorMessage name="title" component="div" className="text-red-500 text-xs" />
+                                <label className="block text-sm font-medium text-gray-700">Title</label>
+                                <span>{values.title}</span>
                             </div>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700">Content</label>
@@ -125,7 +127,7 @@ const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClose, task
                                 <Select
                                     isMulti
                                     name="members"
-                                    options={userOptions}
+                                    options={userOptions.filter(option => !values.members.some(member => member.value === option.value))}
                                     value={values.members}
                                     onChange={selectedOptions => setFieldValue('members', selectedOptions)}
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
@@ -135,6 +137,7 @@ const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClose, task
                                     <div className="text-red-500 text-xs">{errors.members.toString()}</div>
                                 )}
                             </div>
+
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700">Completion Rate</label>
                                 <Field

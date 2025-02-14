@@ -7,8 +7,7 @@ import CompletedTodoCard from "../components/CompletedTodoCard";
 import { deleteTask, fetchTasks, TaskType } from "../../taskSlice";
 import AddTaskModal from "../components/AddTaskModal";
 import { showToast } from "../../../../../common/middleware/showToast";
-import UpdateTaskModal from "../components/UpdateTAskModal";
-import TaskMenuModal from "../components/TAskMenuModal";
+import UpdateTaskModal from "../components/UpdateTaskModal";
 
 export enum TaskTabType {
   TODO = "TODO",
@@ -33,8 +32,10 @@ const TaskScreen: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
+
   const dispatch = useAppDispatch();
   const tasks = useAppSelector((state) => state.tasks.tasks);
+  const status = useAppSelector(state => state.tasks.status);
   const darkMode = useAppSelector(state => state.auth.darkMode);
 
   useEffect(() => {
@@ -52,13 +53,15 @@ const TaskScreen: React.FC = () => {
     setIsEditModalOpen(true);
   };
   const hideEditTaskModal = () => setIsEditModalOpen(false);
-  const onDelete = (taskId: string) => {
-    dispatch(deleteTask(taskId)).then((result) => showToast("success", result?.payload?.toString() || "Task Deleted")).catch((error) => showToast("error", error.message)).finally(() => { });
+  const onDelete = (task: TaskType) => {
+    dispatch(deleteTask(task.id!)).then((result) => showToast("success", result?.payload?.toString() || "Task Deleted")).catch((error) => showToast("error", error.message)).finally(() => { });
   }
 
   const filteredTasks = tasks.filter(task => task.flag === active);
+  if (status === "loading") return <p>Loading tasks...</p>;
 
   return (
+
     <section className={`w-full px-8 py-8 h-[100vh] flex flex-col overflow-y-auto ${darkMode ? "bg-gray-300" : "bg-slate-50"}`}>
       <h1 className="text-2xl pb-8 font-extrabold">Project</h1>
       <section className='flex w-full justify-between items-center mb-8 text-black relative'>
@@ -75,17 +78,21 @@ const TaskScreen: React.FC = () => {
         </button>
       </section>
       <section className="relative flex flex-row justify-items-start items-start flex-wrap gap-2 overflow-y-auto">
-        {filteredTasks.map((task) => {
-          if (active === TaskTabType.TODO) {
-            return <TodoCard key={task.id} task={task} showEditTaskModal={showEditTaskModal} onDelete={onDelete} />;
-          }
-          if (active === TaskTabType.ONGOING) {
-            return <OngoingTodoCard key={task.id} task={task} showEditTaskModal={showEditTaskModal} onDelete={onDelete} />;
-          }
-          if (active === TaskTabType.COMPLETED) {
-            return <CompletedTodoCard key={task.id} task={task} showEditTaskModal={showEditTaskModal} onDelete={onDelete} />;
-          }
-        })}
+        {tasks.length === 0 ? (
+          <p className="text-gray-500 text-center text-2xl font-semibold">No tasks found.</p>
+        ) : (
+          filteredTasks.map((task) => {
+            if (active === TaskTabType.TODO) {
+              return <TodoCard key={task.id} onUpdate={showEditTaskModal} task={task} onDelete={onDelete} />;
+            }
+            if (active === TaskTabType.ONGOING) {
+              return <OngoingTodoCard key={task.id} onUpdate={showEditTaskModal} task={task} onDelete={onDelete} />;
+            }
+            if (active === TaskTabType.COMPLETED) {
+              return <CompletedTodoCard key={task.id} onUpdate={showEditTaskModal} task={task} onDelete={onDelete} />;
+            }
+          }))
+        }
       </section>
     </section>
   );

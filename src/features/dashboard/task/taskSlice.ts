@@ -45,9 +45,7 @@ export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
     const task = childSnapshot.val();
     task.id = childSnapshot.key;
     tasks.push(task);
-    console.log("Task: ", task);
   });
-  console.log("Tasks: ", tasks);
   return tasks;
 });
 
@@ -75,6 +73,22 @@ const authSlice = createSlice({
   reducers: {
     filterTasksByFlag(state, action: PayloadAction<TaskTabType>) {
       state.tasks = state.tasks.filter((task) => task.flag === action.payload);
+    },
+    searchTasks(state, action: PayloadAction<string>) {
+      const searchQuery = action.payload.toLowerCase();
+
+      // Reset to full list if search is empty
+      if (!searchQuery) return;
+
+      const filteredTasks = state.tasks.filter(
+        (task) =>
+          task.title.toLowerCase().includes(searchQuery) ||
+          task.content.toLowerCase().includes(searchQuery)
+      );
+
+      // If no tasks match, return the previous state
+      if (filteredTasks.length === 0) return;
+      state.tasks = filteredTasks;
     },
   },
   extraReducers: (builder) => {
@@ -129,5 +143,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { filterTasksByFlag } = authSlice.actions;
+export const { filterTasksByFlag, searchTasks } = authSlice.actions;
 export default authSlice.reducer;

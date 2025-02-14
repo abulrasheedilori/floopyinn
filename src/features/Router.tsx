@@ -1,6 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { RootState } from '../common/reduxtk/store';
-import OverviewScreen from './dashboard/task/views/screens/OverviewScreen';
 import { useAppSelector } from '../common/reduxtk/hooks';
 import SignUpScreen from './auth/views/screens/SignUpScreen';
 import DashboardLayout from './dashboard/DashboardLayout';

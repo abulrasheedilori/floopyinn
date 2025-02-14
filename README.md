@@ -66,6 +66,11 @@ npm install
 - Run project on local
 npm run dev
 
+What is not done
+------------------------------
+- Mobile responsiveness : because it was not explicitly requested for.
+Tailwind is mobile first styling framework and can be easily done with it.
+
 Live Project Url
 ------------------------------
 - https://floopyinn-433b3.web.app
